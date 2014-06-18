@@ -650,6 +650,21 @@ class StrPrinter(Printer):
     def _print_Domain(self, expr):
         return expr.rep
 
+    def _print_Callable(self, expr):
+        return expr.name
+
+    def _print_Applied(self, expr):
+        return "%s(%s)" % (expr.name,
+                           ', '.join(self._print(arg) for arg in expr.args))
+
+    def _print_Constant(self, expr):
+        return str(expr.name)
+
+    def _print_Quantifier(self, expr):
+        return "%s((%s), %s)" % (expr.func,
+                                 ', '.join(self._print(v) for v in expr.vars),
+                                 expr.expr)
+
 
 def sstr(expr, **settings):
     """Returns the expression as a string.
