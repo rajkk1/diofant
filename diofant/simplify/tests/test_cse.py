@@ -11,6 +11,7 @@ from diofant.simplify import cse_main, cse_opts
 from diofant.matrices import (MutableDenseMatrix,
                               MutableSparseMatrix, ImmutableDenseMatrix,
                               ImmutableSparseMatrix)
+from diofant.matrices.expressions import MatrixSymbol
 
 
 w, x, y, z = symbols('w,x,y,z')
@@ -293,9 +294,18 @@ def test_cse_Indexed():
     assert len(replacements) > 0
 
 
-@pytest.mark.xfail
 def test_cse_MatrixSymbol():
-    from diofant import MatrixSymbol
+    # MatrixSymbols have non-Basic args, so make sure that works
+    A = MatrixSymbol("A", 3, 3)
+    assert cse(A) == ([], [A])
+
+    n = symbols('n', integer=True)
+    B = MatrixSymbol("B", n, n)
+    assert cse(B) == ([], [B])
+
+
+@pytest.mark.xfail
+def test_cse_MatrixExpr():
     A = MatrixSymbol('A', 3, 3)
     y = MatrixSymbol('y', 3, 1)
 
