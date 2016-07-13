@@ -32,3 +32,14 @@ from .evaluate import evaluate
 Catalan = S.Catalan
 EulerGamma = S.EulerGamma
 GoldenRatio = S.GoldenRatio
+
+Pi = S.Pi
+
+Zero = S.Zero
+One = S.One
+NegativeOne = S.NegativeOne
+Half = S.Half
+
+Infinity = S.Infinity
+NegativeInfinity = S.NegativeInfinity
+ComplexInfinity = S.ComplexInfinity
