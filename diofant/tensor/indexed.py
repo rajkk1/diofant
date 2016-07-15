@@ -106,7 +106,7 @@
 #      - Idx with step determined by function call
 
 from diofant.core import Expr, Tuple, Dummy, Symbol, sympify, S
-from diofant.core.compatibility import is_sequence, NotIterable
+from diofant.core.compatibility import is_sequence
 
 
 class IndexException(Exception):
@@ -269,7 +269,7 @@ class Indexed(Expr):
         return "%s[%s]" % (p.doprint(self.base), ", ".join(indices))
 
 
-class IndexedBase(Expr, NotIterable):
+class IndexedBase(Expr):
     """Represent the base or stem of an indexed object
 
     The IndexedBase class represent an array that contains elements. The main purpose

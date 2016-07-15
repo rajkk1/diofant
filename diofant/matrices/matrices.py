@@ -12,8 +12,7 @@ from diofant.core.symbol import Symbol, Dummy, symbols
 from diofant.core.numbers import Integer, ilcm, Rational, Float
 from diofant.core.singleton import S
 from diofant.core.sympify import sympify
-from diofant.core.compatibility import (is_sequence, default_sort_key,
-                                        NotIterable, as_int)
+from diofant.core.compatibility import is_sequence, default_sort_key, as_int
 from diofant.polys import PurePoly, roots, cancel, gcd
 from diofant.simplify import simplify as _simplify, signsimp, nsimplify
 from diofant.utilities.iterables import flatten
@@ -43,7 +42,7 @@ class NonSquareMatrixError(ShapeError):
     pass
 
 
-class DeferredVector(Symbol, NotIterable):
+class DeferredVector(Symbol):
     """A vector whose components are deferred (e.g. for use with lambdify)
 
     Examples

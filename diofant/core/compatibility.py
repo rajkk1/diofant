@@ -4,27 +4,14 @@ we support. Also some functions that are needed Diofant-wide and are located
 here for easy import.
 """
 
+import collections
+import collections.abc
 import os
-from collections import defaultdict
 
 from diofant.external import import_module
 
 
-# These are in here because telling if something is an iterable just by calling
-# hasattr(obj, "__iter__") behaves differently in Python 2 and Python 3.  In
-# particular, hasattr(str, "__iter__") is False in Python 2 and True in Python 3.
-# I think putting them here also makes it easier to use them in the core.
-
-class NotIterable:
-    """
-    Use this as mixin when creating a class which is not supposed to return
-    true when iterable() is called on its instances. I.e. avoid infinite loop
-    when calling e.g. list() on the instance
-    """
-    pass
-
-
-def iterable(i, exclude=(str, dict, NotIterable)):
+def iterable(i, exclude=(str, dict)):
     """
     Return a boolean indicating whether ``i`` is Diofant iterable.
     True also indicates that the iterator is finite, i.e. you e.g.
@@ -64,13 +51,10 @@ def iterable(i, exclude=(str, dict, NotIterable)):
     >>> iterable("no", exclude=str)
     False
     """
-    try:
-        iter(i)
-    except TypeError:
+    if isinstance(i, collections.abc.Iterable):
+        return not isinstance(i, exclude) if exclude else True
+    else:
         return False
-    if exclude:
-        return not isinstance(i, exclude)
-    return True
 
 
 def is_sequence(i, include=None):
@@ -400,7 +384,7 @@ def ordered(seq, keys=None, default=True, warn=False):
     function would be good at returning that quickly if the first group
     of candidates is small relative to the number of items being processed.
     """
-    d = defaultdict(list)
+    d = collections.defaultdict(list)
     if keys:
         if not isinstance(keys, (list, tuple)):
             keys = [keys]
