@@ -7,7 +7,7 @@ from diofant import (limit, exp, oo, log, sqrt, Limit, sin, floor, cos,
                      acos, ceiling, atan, gamma, Symbol, S, pi, E, Integral,
                      cot, Rational, I, tan, integrate, Sum, sign, Piecewise,
                      Function, subfactorial, PoleError, Integer, Float,
-                     diff, simplify)
+                     diff, simplify, erfc)
 from diofant.series.limits import heuristics
 from diofant.series.order import O
 
@@ -486,3 +486,7 @@ def test_issue_11526():
 
     e = log((1/x - b)/(1/x - c))
     assert e.as_leading_term(x) == x*(c - b)
+
+
+def test_issue_11496():
+    assert limit(erfc(log(1/x)), x, oo) == 2

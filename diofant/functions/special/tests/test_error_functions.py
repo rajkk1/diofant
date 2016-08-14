@@ -85,9 +85,14 @@ def test__erfs():
     assert _erfs(1/z).series(z) == \
         z/sqrt(pi) - z**3/(2*sqrt(pi)) + 3*z**5/(4*sqrt(pi)) + O(z**6)
 
-    assert expand(erf(z).rewrite('tractable').diff(z).rewrite('intractable')) \
-        == erf(z).diff(z)
-    assert _erfs(z).rewrite("intractable") == (-erf(z) + 1)*exp(z**2)
+    p = Symbol('p', positive=True)
+    n = Symbol('n', negative=True)
+    assert expand(erf(p).rewrite('tractable').diff(p).rewrite('intractable')) \
+        == erf(p).diff(p)
+    assert expand(erf(n).rewrite('tractable').diff(n).rewrite('intractable')) \
+        == erf(n).diff(n)
+
+    assert _erfs(z).rewrite("intractable") == (-erf(Abs(z)) + z/Abs(z))*exp(z**2)
 
 
 def test_erfc():

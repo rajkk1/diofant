@@ -11,6 +11,7 @@ from diofant.functions.elementary.complexes import polar_lift
 from diofant.functions.elementary.hyperbolic import cosh, sinh
 from diofant.functions.elementary.trigonometric import cos, sin
 from diofant.functions.special.hyper import hyper, meijerg
+from diofant.functions import Abs
 
 # TODO series expansions
 # TODO see the "Note:" in Ei
@@ -178,7 +179,7 @@ class erf(Function):
         return sqrt(z**2)/z - z*expint(S.Half, z**2)/sqrt(S.Pi)
 
     def _eval_rewrite_as_tractable(self, z):
-        return S.One - _erfs(z)*exp(-z**2)
+        return (S.One - _erfs(Abs(z))*exp(-z**2))*z/Abs(z)
 
     def _eval_rewrite_as_erfc(self, z):
         return S.One - erfc(z)
@@ -2367,7 +2368,7 @@ class _erfs(Function):
             raise ArgumentIndexError(self, argindex)
 
     def _eval_rewrite_as_intractable(self, z):
-        return (S.One - erf(z))*exp(z**2)
+        return (z/Abs(z) - erf(Abs(z)))*exp(z**2)
 
     def _eval_evalf(self, prec):
         return self.rewrite('intractable').evalf(prec)
