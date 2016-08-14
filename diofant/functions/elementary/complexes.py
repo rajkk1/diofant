@@ -349,6 +349,14 @@ class sign(Function):
     def _eval_nseries(self, x, n, logx):
         direction = self.args[0].as_leading_term(x).as_coeff_exponent(x)[0]
         if direction.is_extended_real:
+            from diofant import expand_log
+            direction = expand_log(direction)
+            if direction.has(log(x)):
+                c, e = direction.as_coeff_exponent(log(x))
+                if e.is_integer:
+                    if e.is_odd:
+                        c = -c
+                    direction = c
             return self.func(direction)
         else:
             return super(sign, self)._eval_nseries(x, n, logx)
