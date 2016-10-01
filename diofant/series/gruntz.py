@@ -69,6 +69,7 @@ from functools import reduce
 
 from diofant.core import S, Dummy, Mul, Add, evaluate, Float
 from diofant.core.compatibility import ordered
+from diofant.core.function import UndefinedFunction
 from diofant.functions import log, exp, sign as sgn
 from diofant.core.cache import cacheit
 
@@ -150,7 +151,7 @@ def mrv(e, x):
             return mrv(e.base, x)
     elif e.func is log:
         return mrv(e.args[0], x)
-    elif e.is_Function:
+    elif e.is_Function and not isinstance(e, UndefinedFunction):
         return reduce(lambda a, b: mrv_max(a, b, x), [mrv(a, x) for a in e.args])
     else:
         raise NotImplementedError("Don't know how to calculate the mrv of '%s'" % e)
