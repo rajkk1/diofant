@@ -504,6 +504,9 @@ class Basic(object):
         """
         return self._args
 
+    def __getitem__(self, key):
+        return self._args[key]
+
     @property
     def _sorted_args(self):
         """

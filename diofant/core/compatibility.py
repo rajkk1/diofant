@@ -66,6 +66,11 @@ def iterable(i, exclude=(str, dict, NotIterable)):
     >>> iterable("no", exclude=str)
     False
     """
+    from .basic import Atom
+
+    if isinstance(i, Atom):
+        return False
+
     try:
         iter(i)
     except TypeError:
@@ -111,8 +116,10 @@ def is_sequence(i, include=None):
     >>> is_sequence(generator, include=(str, GeneratorType))
     True
     """
+    from .basic import Atom
+
     return (hasattr(i, '__getitem__') and
-            iterable(i) or
+            iterable(i) and not isinstance(i, Atom) or
             bool(include) and
             isinstance(i, include))
 
