@@ -208,6 +208,7 @@ class Basic(object):
             return True
 
         from .function import AppliedUndef
+        from .relational import Equality
 
         if type(self) is not type(other):
             # issue sympy/sympy#6100 a**1.0 == a like a**2.0 == a**2
@@ -227,7 +228,18 @@ class Basic(object):
             elif type(self) is not type(other):
                 return False
 
-        return self._hashable_content() == other._hashable_content()
+        if self._hashable_content() == other._hashable_content():
+            return True
+        else:
+            return Equality(self, other, evaluate=False)
+
+    def __ne__(self, other):
+        from .relational import Unequality
+
+        if (self == other) is True:
+            return False
+        else:
+            return Unequality(self, other, evaluate=False)
 
     def dummy_eq(self, other, symbol=None):
         """
@@ -1254,7 +1266,7 @@ class Basic(object):
         if not isinstance(expr, self.__class__):
             return
 
-        if self == expr:
+        if (self == expr) is True:
             return repl_dict
 
         if len(self.args) != len(expr.args):
@@ -1262,7 +1274,7 @@ class Basic(object):
 
         d = repl_dict.copy()
         for arg, other_arg in zip(self.args, expr.args):
-            if arg == other_arg:
+            if (arg == other_arg) is True:
                 continue
             d = arg.xreplace(d).matches(other_arg, d)
             if d is None:
@@ -1511,7 +1523,7 @@ def _aresame(a, b):
     """
     from .function import AppliedUndef, UndefinedFunction as UndefFunc
     for i, j in zip_longest(preorder_traversal(a), preorder_traversal(b)):
-        if i != j or type(i) != type(j):
+        if (i != j) is True or type(i) != type(j):
             if (isinstance(i, (UndefFunc, AppliedUndef)) and
                     isinstance(j, (UndefFunc, AppliedUndef))):
                 if i.class_key() != j.class_key():

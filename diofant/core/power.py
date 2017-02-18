@@ -315,7 +315,7 @@ class Pow(Expr):
 
     def _eval_is_positive(self):
         from ..functions import log
-        if self.base == self.exp:
+        if (self.base == self.exp) is True:
             if self.base.is_nonnegative:
                 return True
         elif self.base.is_positive:
