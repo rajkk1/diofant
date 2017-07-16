@@ -1,8 +1,9 @@
 """Implementaton of :class:`GMPYIntegerRing` class. """
 
 from ..polys.polyerrors import CoercionFailed
-from .groundtypes import (DiofantInteger, GMPYInteger, gmpy_factorial,
-                          gmpy_gcd, gmpy_gcdex, gmpy_lcm, gmpy_sqrt)
+from .groundtypes import (DiofantInteger, GMPYInteger, GMPYRational,
+                          PythonInteger, gmpy_factorial, gmpy_gcd, gmpy_gcdex,
+                          gmpy_lcm, gmpy_sqrt)
 from .integerring import IntegerRing
 
 
@@ -20,6 +21,13 @@ class GMPYIntegerRing(IntegerRing):
 
     def __init__(self):
         """Allow instantiation of this domain. """
+
+    def new(self, *args):
+        args = list(args)
+        for n, a in enumerate(args):
+            if not isinstance(a, (type(GMPYRational(0)), type(GMPYInteger(0)))):
+                args[n] = PythonInteger(a)
+        return super().new(*args)
 
     def to_diofant(self, a):
         """Convert ``a`` to a Diofant object. """

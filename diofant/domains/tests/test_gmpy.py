@@ -1,5 +1,6 @@
 import pytest
 
+from diofant.core import Integer, Rational
 from diofant.domains import (CC, FF, FF_gmpy, PythonRational, QQ_gmpy,
                              QQ_python, ZZ_gmpy, ZZ_python)
 from diofant.external import import_module
@@ -39,3 +40,9 @@ def test_convert():
 
     assert CC.convert(gmpy.mpz(3)) == CC(3)
     assert CC.convert(gmpy.mpq(1, 2)) == CC(0.5)
+
+    assert ZZ_gmpy()(Integer(2)) == ZZ_gmpy()(2) == ZZ_gmpy()(gmpy.mpz(2))
+    assert QQ_gmpy()(Rational(2, 3)) == QQ_gmpy()(2, 3) == QQ_gmpy()(gmpy.mpz(2),
+                                                                     gmpy.mpz(3))
+    assert QQ_gmpy()(Rational(1, 2), Rational(1, 3)) == QQ_gmpy()(3, 2)
+    assert QQ_gmpy()(Integer(2), Integer(3)) == QQ_gmpy()(2, 3)

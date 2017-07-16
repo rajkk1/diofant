@@ -1,8 +1,9 @@
 """Implementaton of :class:`GMPYRationalField` class. """
 
 from ..polys.polyerrors import CoercionFailed
-from .groundtypes import (DiofantRational, GMPYRational, gmpy_denom,
-                          gmpy_factorial, gmpy_numer, gmpy_qdiv)
+from .groundtypes import (DiofantRational, GMPYInteger, GMPYRational,
+                          PythonRational, gmpy_denom, gmpy_factorial,
+                          gmpy_numer, gmpy_qdiv)
 from .rationalfield import RationalField
 
 
@@ -20,6 +21,13 @@ class GMPYRationalField(RationalField):
 
     def __init__(self):
         pass
+
+    def new(self, *args):
+        args = list(args)
+        for n, a in enumerate(args):
+            if not isinstance(a, (type(GMPYRational(0)), type(GMPYInteger(0)))):
+                args[n] = PythonRational(a)
+        return super().new(*args)
 
     def get_ring(self):
         """Returns ring associated with ``self``. """
