@@ -1,5 +1,5 @@
 """
-Mathematica code printer
+Mathematica code printer.
 """
 
 import types
@@ -52,7 +52,7 @@ class MCodePrinter(CodePrinter):
     _not_supported = set()
 
     def __init__(self, settings={}):
-        """Register function mappings supplied by user"""
+        """Register function mappings supplied by user."""
         CodePrinter.__init__(self, settings)
         self.known_functions = dict(known_functions)
         userfuncs = settings.get('user_functions', {})
@@ -172,7 +172,7 @@ class MCodePrinter(CodePrinter):
 
 
 def mathematica_code(expr, **settings):
-    r"""Converts an expr to a string of the Wolfram Mathematica code
+    r"""Converts an expr to a string of the Wolfram Mathematica code.
 
     Examples
     ========

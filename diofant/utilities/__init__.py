@@ -1,6 +1,4 @@
-"""This module contains some general purpose utilities that are used across
-Diofant.
-"""
+"""This module contains some general purpose utilities."""
 
 from .iterables import (flatten, group, take, subsets,  # noqa: F401
                         variations, numbered_symbols, capture, dict_merge,

@@ -239,7 +239,7 @@ class SATSolver:
     ########################
     @property
     def _current_level(self):
-        """The current decision level data structure
+        """The current decision level data structure.
 
         Examples
         ========
@@ -460,7 +460,7 @@ class SATSolver:
 
     def _vsids_calculate(self):
         """
-        VSIDS Heuristic Calculation
+        VSIDS Heuristic Calculation.
 
         Examples
         ========

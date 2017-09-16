@@ -41,8 +41,9 @@ class PythonPrinter(ReprPrinter, StrPrinter):
 
 
 def python(expr, **settings):
-    """Return Python interpretation of passed expression
-    (can be passed to the exec() function without any modifications)
+    """Return Python interpretation of passed expression.
+
+    This can be passed to the exec() function without any modifications.
     """
     from ..core import Symbol, Function
 
@@ -83,5 +84,5 @@ def python(expr, **settings):
 
 
 def print_python(expr, **settings):
-    """Print output of python() function"""
+    """Print output of python() function."""
     print(python(expr, **settings))

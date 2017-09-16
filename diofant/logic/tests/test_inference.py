@@ -1,4 +1,4 @@
-"""For more tests on satisfiability, see test_dimacs"""
+"""For more tests on satisfiability, see test_dimacs."""
 
 import pytest
 
@@ -182,7 +182,7 @@ def test_PropKB():
 
 
 def test_propKB_tolerant():
-    """tolerant to bad input"""
+    """Tolerant to bad input."""
     kb = PropKB()
     assert kb.ask(B) is False
 

@@ -1,4 +1,4 @@
-"""For reading in DIMACS file format
+"""For reading in DIMACS file format.
 
 www.cs.ubc.ca/~hoos/SATLIB/Benchmarks/SAT/satformat.ps
 """

@@ -1,6 +1,7 @@
 """
-This module exports all latin and greek letters as Symbols, so you can
-conveniently do
+This module exports all latin and greek letters as Symbol's.
+
+So you can conveniently do
 
     >>> from diofant.abc import x, y
 

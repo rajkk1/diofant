@@ -70,7 +70,7 @@ if theano:  # pragma: no branch
 
 
 class TheanoPrinter(Printer):
-    """ Code printer for Theano computations """
+    """ Code printer for Theano computations. """
 
     printmethod = "_theano"
 
@@ -196,11 +196,12 @@ def theano_code(expr, cache=global_cache, **kwargs):
 
 def dim_handling(inputs, dim=None, dims={}, broadcastables={}, keys=(),
                  **kwargs):
-    """ Handle various input types for dimensions in tensor_wrap
+    """ Handle various input types for dimensions in tensor_wrap.
 
-    See Also:
-        tensor_wrap
-        theano_funciton
+    See Also
+    ========
+
+    theano_funciton
     """
     if dim:
         dims = dict(zip(inputs, [dim]*len(inputs)))
@@ -212,7 +213,7 @@ def dim_handling(inputs, dim=None, dims={}, broadcastables={}, keys=(),
 
 
 def theano_function(inputs, outputs, dtypes={}, cache=None, **kwargs):
-    """ Create Theano function from Diofant expressions """
+    """ Create Theano function from Diofant expressions. """
     if not theano:  # pragma: no cover
         raise ImportError("theano is required for theano_function")
     cache = {} if cache is None else cache

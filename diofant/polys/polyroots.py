@@ -156,7 +156,7 @@ def roots_cubic(f, trig=False):
 
 def _roots_quartic_euler(p, q, r, a):
     """
-    Descartes-Euler solution of the quartic equation
+    Descartes-Euler solution of the quartic equation.
 
     Parameters
     ==========

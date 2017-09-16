@@ -47,7 +47,7 @@ def term_atomic(op, args):
 
 
 def rm_id(isid):
-    """ Create a rule to remove identities
+    """ Create a rule to remove identities.
 
     isid - fn :: x -> Bool  --- whether or not this element is an identity
 
@@ -79,7 +79,7 @@ def rm_id(isid):
 
 
 def glom(key, count, combine):
-    """ Create a rule to conglomerate identical args
+    """ Create a rule to conglomerate identical args.
 
     >>> from diofant.core.strategies import glom
     >>> from diofant import Add
@@ -116,7 +116,7 @@ def glom(key, count, combine):
 
 
 def sort(key):
-    """ Create a rule to sort by a key function
+    """ Create a rule to sort by a key function.
 
     >>> from diofant.core.strategies import sort
     >>> from diofant import Basic
@@ -134,7 +134,7 @@ def sort(key):
 
 
 def unpack(expr):
-    """ Rule to unpack singleton args
+    """ Rule to unpack singleton args.
 
     >>> from diofant.core.strategies import unpack
     >>> from diofant import Basic
@@ -148,7 +148,7 @@ def unpack(expr):
 
 
 def flatten(expr):
-    """ Flatten T(a, b, T(c, d), T2(e)) to T(a, b, c, d, T2(e)) """
+    """ Flatten T(a, b, T(c, d), T2(e)) to T(a, b, c, d, T2(e)). """
     cls = operator(expr)
     args = []
     for arg in arguments(expr):

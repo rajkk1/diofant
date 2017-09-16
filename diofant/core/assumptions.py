@@ -325,7 +325,7 @@ Test if self belongs to the field of antihermitian operators.
 
 
 class StdFactKB(FactKB):
-    """A FactKB specialised for the built-in rules
+    """A FactKB specialised for the built-in rules.
 
     This is the only kind of FactKB that Basic objects should use.
     """
@@ -352,7 +352,7 @@ class StdFactKB(FactKB):
 
 
 def as_property(fact):
-    """Convert a fact name to the name of the corresponding property"""
+    """Convert a fact name to the name of the corresponding property."""
     return 'is_%s' % fact
 
 
@@ -478,7 +478,7 @@ def _ask(fact, obj):
 
 
 class ManagedProperties(type):
-    """Metaclass for classes with old-style assumptions"""
+    """Metaclass for classes with old-style assumptions."""
 
     def __init__(self, *args, **kws):
         local_defs = {}

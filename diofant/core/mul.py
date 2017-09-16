@@ -686,7 +686,7 @@ class Mul(AssocOp):
         return S.One, self
 
     def as_real_imag(self, deep=True, **hints):
-        """Returns real and imaginary parts of self
+        """Returns real and imaginary parts of self.
 
         See Also
         ========

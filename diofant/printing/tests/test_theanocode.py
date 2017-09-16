@@ -23,7 +23,7 @@ sy = diofant
 
 
 def fgraph_of(*exprs):
-    """ Transform Diofant expressions into Theano Computation """
+    """ Transform Diofant expressions into Theano Computation. """
     outs = list(map(theano_code, exprs))
     ins = theano.gof.graph.inputs(outs)
     ins, outs = theano.gof.graph.clone(ins, outs)
@@ -31,7 +31,7 @@ def fgraph_of(*exprs):
 
 
 def theano_simplify(fgraph):
-    """ Simplify a Theano Computation """
+    """ Simplify a Theano Computation. """
     mode = theano.compile.get_default_mode().excluding("fusion")
     fgraph = fgraph.clone()
     mode.optimizer.optimize(fgraph)
@@ -39,7 +39,7 @@ def theano_simplify(fgraph):
 
 
 def theq(a, b):
-    """ theano equality """
+    """ theano equality. """
     astr = theano.printing.debugprint(a, file='str')
     bstr = theano.printing.debugprint(b, file='str')
 

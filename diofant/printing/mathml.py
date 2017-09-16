@@ -10,7 +10,7 @@ from .printer import Printer
 
 
 class MathMLPrinter(Printer):
-    """Prints an expression to the MathML markup language
+    """Prints an expression to the MathML markup language.
 
     Whenever possible tries to use Content markup and not Presentation markup.
 
@@ -187,9 +187,8 @@ class MathMLPrinter(Printer):
         return self.dom.createElement('eulergamma')
 
     def _print_GoldenRatio(self, e):
-        """We use unicode #x3c6 for Greek letter phi as defined here
-        http://www.w3.org/2003/entities/2007doc/isogrk1.html
-        """
+        # We use unicode #x3c6 for Greek letter phi as defined here
+        # http://www.w3.org/2003/entities/2007doc/isogrk1.html
         x = self.dom.createElement('cn')
         x.appendChild(self.dom.createTextNode("\N{GREEK SMALL LETTER PHI}"))
         return x
@@ -360,9 +359,8 @@ class MathMLPrinter(Printer):
         return x
 
     def _print_list(self, seq):
-        """MathML reference for the <list> element:
-        http://www.w3.org/TR/MathML2/chapter4.html#contm.list
-        """
+        # MathML reference for the <list> element:
+        # http://www.w3.org/TR/MathML2/chapter4.html#contm.list
         dom_element = self.dom.createElement('list')
         for item in seq:
             dom_element.appendChild(self._print(item))
@@ -375,13 +373,13 @@ class MathMLPrinter(Printer):
 
 
 def mathml(expr, **settings):
-    """Returns the MathML representation of expr"""
+    """Returns the MathML representation of expr."""
     return MathMLPrinter(settings).doprint(expr)
 
 
 def print_mathml(expr, **settings):
     """
-    Prints a pretty representation of the MathML code for expr
+    Prints a pretty representation of the MathML code for expr.
 
     Examples
     ========

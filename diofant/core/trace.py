@@ -9,7 +9,7 @@ from .sympify import sympify
 
 
 def _is_scalar(e):
-    """ Helper method used in Tr"""
+    """ Helper method used in Tr."""
 
     # sympify to set proper attributes
     e = sympify(e)
@@ -22,7 +22,7 @@ def _is_scalar(e):
 
 
 def _cycle_permute(l):
-    """ Cyclic permutations based on canonical ordering
+    """ Cyclic permutations based on canonical ordering.
 
     This method does the sort based ascii values while
     a better approach would be to used lexicographic sort.

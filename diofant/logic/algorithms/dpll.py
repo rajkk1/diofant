@@ -130,8 +130,10 @@ def unit_propagate(clauses, s):
 
 def find_pure_symbol(symbols, unknown_clauses):
     """
-    Find a symbol and its value if it appears only as a positive literal
-    (or only as a negative) in clauses.
+    Find a pure symbol in clauses.
+
+    Return symbol and its value if it occurs with only one polarity
+    (e.g. only as a positive literal) in clauses.
 
     Arguments are expected to be in integer representation.
 

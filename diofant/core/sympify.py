@@ -1,4 +1,4 @@
-"""sympify -- convert objects Diofant internal format"""
+"""sympify -- convert objects Diofant internal format."""
 
 from inspect import getmro
 

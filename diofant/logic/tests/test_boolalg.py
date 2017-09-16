@@ -20,7 +20,7 @@ __all__ = ()
 
 
 def test_overloading():
-    """Test that |, & are overloaded as expected"""
+    """Test that |, & are overloaded as expected."""
 
     assert A & B == And(A, B)
     assert A | B == Or(A, B)
@@ -285,9 +285,7 @@ def test_bool_map():
 
 
 def test_bool_symbol():
-    """Test that mixing symbols with boolean values
-    works as expected
-    """
+    """Test that mixing symbols with boolean values works as expected."""
 
     assert And(A, True) == A
     assert And(A, True, True) == A
@@ -327,7 +325,7 @@ see http://en.wikipedia.org/wiki/Boolean_algebra_(structure)
 
 
 def test_commutative():
-    """Test for commutativity of And and Or"""
+    """Test for commutativity of And and Or."""
     A, B = map(Boolean, symbols('A,B'))
 
     assert A & B == B & A
@@ -335,7 +333,7 @@ def test_commutative():
 
 
 def test_and_associativity():
-    """Test for associativity of And"""
+    """Test for associativity of And."""
 
     assert (A & B) & C == A & (B & C)
 

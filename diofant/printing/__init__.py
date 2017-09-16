@@ -1,4 +1,4 @@
-"""Printing subsystem"""
+"""Printing subsystem."""
 
 from .pretty import (pretty, pretty_print, pprint,  # noqa: F401
                      pprint_use_unicode, pprint_try_use_unicode)

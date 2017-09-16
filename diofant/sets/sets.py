@@ -104,7 +104,7 @@ class Set(Basic):
 
     def is_disjoint(self, other):
         """
-        Returns True if 'self' and 'other' are disjoint
+        Returns True if 'self' and 'other' are disjoint.
 
         Examples
         ========
@@ -208,7 +208,7 @@ class Set(Basic):
     @property
     def inf(self):
         """
-        The infimum of 'self'
+        The infimum of 'self'.
 
         Examples
         ========
@@ -228,7 +228,7 @@ class Set(Basic):
     @property
     def sup(self):
         """
-        The supremum of 'self'
+        The supremum of 'self'.
 
         Examples
         ========
@@ -289,7 +289,7 @@ class Set(Basic):
 
     def issubset(self, other):
         """
-        Alias for :meth:`is_subset()`
+        Alias for :meth:`is_subset()`.
         """
         return self.is_subset(other)
 
@@ -331,7 +331,7 @@ class Set(Basic):
 
     def issuperset(self, other):
         """
-        Alias for :meth:`is_superset()`
+        Alias for :meth:`is_superset()`.
         """
         return self.is_superset(other)
 
@@ -382,7 +382,7 @@ class Set(Basic):
     @property
     def measure(self):
         """
-        The (Lebesgue) measure of 'self'
+        The (Lebesgue) measure of 'self'.
 
         Examples
         ========
@@ -398,7 +398,7 @@ class Set(Basic):
     @property
     def boundary(self):
         """
-        The boundary or frontier of a set
+        The boundary or frontier of a set.
 
         A point x is on the boundary of a set S if
 
@@ -1128,7 +1128,7 @@ class Union(Set, EvalfMixin):
     @staticmethod
     def reduce(args):
         """
-        Simplify a :class:`Union` using known rules
+        Simplify a :class:`Union` using known rules.
 
         We first start with global rules like
         'Merge all FiniteSets'
@@ -1239,7 +1239,7 @@ class Union(Set, EvalfMixin):
     @property
     def _boundary(self):
         def boundary_of_set(i):
-            """ The boundary of set i minus interior of all other sets """
+            """ The boundary of set i minus interior of all other sets. """
             b = self.args[i].boundary
             for j, a in enumerate(self.args):
                 if j != i:
@@ -1265,7 +1265,7 @@ class Union(Set, EvalfMixin):
         # roundrobin recipe taken from itertools documentation:
         # https://docs.python.org/3/library/itertools.html#itertools-recipes
         def roundrobin(*iterables):
-            """roundrobin('ABC', 'D', 'EF') --> A D E B F C"""
+            """roundrobin('ABC', 'D', 'EF') --> A D E B F C."""
             sentinel = object()
             it = itertools.chain.from_iterable(itertools.zip_longest(fillvalue=sentinel, *iterables))
             return (i for i in it if i is not sentinel)
@@ -1355,7 +1355,7 @@ class Intersection(Set):
     @staticmethod
     def reduce(args):
         """
-        Simplify an intersection using known rules
+        Simplify an intersection using known rules.
 
         We first start with global rules like
         'if any empty sets return empty set' and 'distribute any unions'
@@ -1424,7 +1424,7 @@ class Intersection(Set):
             return Intersection(args, evaluate=False)
 
     def as_relational(self, symbol):
-        """Rewrite an Intersection in terms of equalities and logic operators"""
+        """Rewrite an Intersection in terms of equalities and logic operators."""
         return And(*[set.as_relational(symbol) for set in self.args])
 
 
@@ -1603,7 +1603,7 @@ class UniversalSet(Set, metaclass=Singleton):
 
 class FiniteSet(Set, EvalfMixin):
     """
-    Represents a finite set of discrete numbers
+    Represents a finite set of discrete numbers.
 
     Examples
     ========

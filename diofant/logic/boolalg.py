@@ -361,7 +361,7 @@ class And(LatticeOp, BooleanFunction):
 
 class Or(LatticeOp, BooleanFunction):
     """
-    Logical OR function
+    Logical OR function.
 
     It evaluates its arguments in order, giving True immediately
     if any of them are True, and False if they are all False.

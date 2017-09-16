@@ -2,7 +2,7 @@ from ..logic.boolalg import BooleanFunction
 
 
 class Contains(BooleanFunction):
-    """Asserts that x is an element of the set S
+    """Asserts that x is an element of the set S.
 
     Examples
     ========

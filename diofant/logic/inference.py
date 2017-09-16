@@ -1,4 +1,4 @@
-"""Inference in propositional logic"""
+"""Inference in propositional logic."""
 
 from ..core import sympify
 from ..core.compatibility import ordered
@@ -203,7 +203,7 @@ def entails(expr, formula_set={}):
 
 
 class KB:
-    """Base class for all knowledge bases"""
+    """Base class for all knowledge bases."""
 
     def __init__(self, sentence=None):
         self.clauses_ = set()
@@ -228,7 +228,7 @@ class PropKB(KB):
     """A KB for Propositional Logic.  Inefficient, with no indexing."""
 
     def tell(self, sentence):
-        """Add the sentence's clauses to the KB
+        """Add the sentence's clauses to the KB.
 
         Examples
         ========
@@ -267,7 +267,7 @@ class PropKB(KB):
         return entails(query, self.clauses_)
 
     def retract(self, sentence):
-        """Remove the sentence's clauses from the KB
+        """Remove the sentence's clauses from the KB.
 
         Examples
         ========
