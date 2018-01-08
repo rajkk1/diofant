@@ -446,7 +446,6 @@ def test_Mul_is_even_odd():
     assert (x*(x + m)).is_odd is None
 
 
-@pytest.mark.xfail
 def test_evenness_in_ternary_integer_product_with_odd():
     # Tests that oddness inference is independent of term ordering.
     # Term ordering at the point of testing depends on Diofant's symbol order, so
@@ -465,7 +464,6 @@ def test_evenness_in_ternary_integer_product_with_even():
     assert (x*y*(y + m)).is_even is None
 
 
-@pytest.mark.xfail
 def test_oddness_in_ternary_integer_product_with_odd():
     # Tests that oddness inference is independent of term ordering.
     # Term ordering at the point of testing depends on Diofant's symbol order, so
