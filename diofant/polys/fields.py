@@ -1,7 +1,7 @@
 """Sparse rational function fields. """
 
-from functools import reduce
-from operator import add, ge, gt, le, lt, mul
+import functools
+import operator
 
 from ..core import Expr, Symbol, sympify
 from ..core.sympify import CantSympify
@@ -147,14 +147,14 @@ class FractionField(Field, CompositeDomain):
         domain = self.domain
 
         def _rebuild(expr):
-            generator = mapping.get(expr)
-
-            if generator is not None:
-                return generator
+            if expr in mapping:
+                return mapping[expr]
+            elif 1/expr in mapping:
+                return 1/mapping[1/expr]
             elif expr.is_Add:
-                return reduce(add, list(map(_rebuild, expr.args)))
+                return functools.reduce(operator.add, map(_rebuild, expr.args))
             elif expr.is_Mul:
-                return reduce(mul, list(map(_rebuild, expr.args)))
+                return functools.reduce(operator.mul, map(_rebuild, expr.args))
             elif expr.is_Pow:
                 c, a = expr.exp.as_coeff_Mul(rational=True)
                 if c.is_Integer and c != 1:
@@ -328,16 +328,16 @@ class FracElement(DomainElement, DefaultPrinting, CantSympify):
             return NotImplemented
 
     def __lt__(self, other):
-        return self._cmp(other, lt)
+        return self._cmp(other, operator.lt)
 
     def __le__(self, other):
-        return self._cmp(other, le)
+        return self._cmp(other, operator.le)
 
     def __gt__(self, other):
-        return self._cmp(other, gt)
+        return self._cmp(other, operator.gt)
 
     def __ge__(self, other):
-        return self._cmp(other, ge)
+        return self._cmp(other, operator.ge)
 
     def __pos__(self):
         return self.raw_new(self.numer, self.denom)

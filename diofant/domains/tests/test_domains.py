@@ -450,6 +450,10 @@ def test_Domain__contains__():
 
     assert (Rational(3, 2)*x/(y + 1) - z in QQ.poly_ring(x, y, z)) is False
 
+    # issue sympy/sympy#14433
+    assert (1/x in QQ.frac_field(1/x)) is True
+    assert (x in QQ.frac_field(1/x)) is True
+
 
 def test_Domain_ring():
     assert ZZ.has_assoc_Ring is True
