@@ -13,7 +13,7 @@ from .densebasic import (dmp_apply_pairs, dmp_convert, dmp_degree_in,
 from .densetools import (dmp_clear_denoms, dmp_diff_in, dmp_eval_in,
                          dmp_ground_monic, dmp_ground_primitive,
                          dmp_ground_trunc, dup_trunc)
-from .galoistools import gf_crt, gf_int
+from .galoistools import gf_crt
 from .heuristicgcd import heugcd
 from .polyconfig import query
 from .polyerrors import (DomainError, HeuristicGCDFailed, HomomorphismFailed,
@@ -461,11 +461,11 @@ def dmp_zz_modular_resultant(f, g, p, u, K):
     >>> g = 2*x*y + x + 3
 
     >>> R.dmp_zz_modular_resultant(f, g, 5)
-    -2*y**2 + 1
+    3*y**2 + 1
 
     """
     if not u:
-        return gf_int(dup_prs_resultant(f, g, K)[0] % p, p)
+        return dup_prs_resultant(f, g, K)[0] % p
 
     v = u - 1
 
@@ -487,10 +487,10 @@ def dmp_zz_modular_resultant(f, g, p, u, K):
             if a == p:
                 raise HomomorphismFailed('no luck')
 
-            F = dmp_eval_in(f, gf_int(a, p), 1, u, K)
+            F = dmp_eval_in(f, a % p, 1, u, K)
 
             if dmp_degree_in(F, 0, v) == n:
-                G = dmp_eval_in(g, gf_int(a, p), 1, u, K)
+                G = dmp_eval_in(g, a % p, 1, u, K)
 
                 if dmp_degree_in(G, 0, v) == m:
                     break
@@ -522,7 +522,7 @@ def dmp_zz_modular_resultant(f, g, p, u, K):
 
 def _collins_crt(r, R, P, p, K):
     """Wrapper of CRT for Collins's resultant algorithm."""
-    return gf_int(gf_crt([r, R], [P, p], K), P*p)
+    return gf_crt([r, R], [P, p], K) % (P*p)
 
 
 def dmp_zz_collins_resultant(f, g, u, K):

@@ -249,23 +249,10 @@ def dup_trunc(f, p, K):
     >>> R, x = ring("x", ZZ)
 
     >>> R.dup_trunc(2*x**3 + 3*x**2 + 5*x + 7, ZZ(3))
-    -x**3 - x + 1
+    2*x**3 + 2*x + 1
 
     """
-    if K.is_IntegerRing:
-        g = []
-
-        for c in f:
-            c = c % p
-
-            if c > p // 2:
-                g.append(c - p)
-            else:
-                g.append(c)
-    else:
-        g = [c % p for c in f]
-
-    return dmp_strip(g, 0)
+    return dmp_strip([c % p for c in f], 0)
 
 
 def dmp_trunc(f, p, u, K):
@@ -299,7 +286,7 @@ def dmp_ground_trunc(f, p, u, K):
     >>> f = 3*x**2*y + 8*x**2 + 5*x*y + 6*x + 2*y + 3
 
     >>> R.dmp_ground_trunc(f, ZZ(3))
-    -x**2 - x*y - y
+    2*x**2 + 2*x*y + 2*y
 
     """
     if not u:
