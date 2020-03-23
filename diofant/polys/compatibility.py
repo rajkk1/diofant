@@ -8,9 +8,8 @@ from .densearith import (dmp_abs, dmp_add, dmp_add_mul, dmp_add_term, dmp_div,
 from .densebasic import (dmp_degree_in, dmp_degree_list, dmp_ground_LC,
                          dmp_ground_TC, dmp_LC, dmp_TC, dmp_to_dict)
 from .densetools import (dmp_clear_denoms, dmp_compose, dmp_diff_eval_in,
-                         dmp_eval_in, dmp_eval_tail, dmp_ground_monic,
-                         dmp_ground_trunc, dup_decompose, dup_real_imag,
-                         dup_transform)
+                         dmp_eval_tail, dmp_ground_monic, dmp_ground_trunc,
+                         dup_decompose, dup_real_imag, dup_transform)
 from .euclidtools import dmp_resultant, dmp_zz_modular_resultant
 from .factortools import (dmp_factor_list, dmp_trial_division,
                           dmp_zz_diophantine, dmp_zz_mignotte_bound,
@@ -153,13 +152,6 @@ class IPolys:
 
     def dmp_degree_list(self, f):
         return dmp_degree_list(self.to_dense(f), self.ngens-1)
-
-    def dmp_eval_in(self, f, a, j):
-        result = dmp_eval_in(self.to_dense(f), a, j, self.ngens-1, self.domain)
-        if self.ngens > 1:
-            return self.drop(j).from_dense(result)
-        else:
-            return result
 
     def dmp_diff_eval_in(self, f, m, a, j):
         result = dmp_diff_eval_in(self.to_dense(f), m, a, j, self.ngens-1, self.domain)
