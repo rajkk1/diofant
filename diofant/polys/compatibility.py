@@ -9,8 +9,8 @@ from .densebasic import (dmp_degree_in, dmp_degree_list, dmp_ground_LC,
                          dmp_ground_TC, dmp_LC, dmp_TC, dmp_to_dict)
 from .densetools import (dmp_clear_denoms, dmp_compose, dmp_diff_eval_in,
                          dmp_eval_in, dmp_eval_tail, dmp_ground_monic,
-                         dmp_ground_trunc, dup_decompose, dup_mirror,
-                         dup_real_imag, dup_scale, dup_shift, dup_transform)
+                         dmp_ground_trunc, dup_decompose, dup_real_imag,
+                         dup_scale, dup_shift, dup_transform)
 from .euclidtools import dmp_resultant, dmp_zz_modular_resultant
 from .factortools import (dmp_factor_list, dmp_trial_division,
                           dmp_zz_diophantine, dmp_zz_mignotte_bound,
@@ -187,9 +187,6 @@ class IPolys:
         if ring.domain.is_ComplexAlgebraicField and not ring.domain.is_RealAlgebraicField:
             ring = ring.to_ground()
         return ring.from_dense(p), ring.from_dense(q)
-
-    def dup_mirror(self, f):
-        return self.from_dense(dup_mirror(self.to_dense(f), self.domain))
 
     def dup_scale(self, f, a):
         return self.from_dense(dup_scale(self.to_dense(f), a, self.domain))
