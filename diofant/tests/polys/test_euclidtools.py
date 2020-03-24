@@ -85,7 +85,7 @@ def test_dmp_prem():
 
     assert f.prem(g) == r
 
-    pytest.raises(ZeroDivisionError, lambda: f.prem(0))
+    pytest.raises(ZeroDivisionError, lambda: f.prem(R(0)))
 
     f = x**2 + 1
     g = 2*x - 4
@@ -117,7 +117,7 @@ def test_dmp_prem():
 
     assert f.prem(g) == r
 
-    pytest.raises(ZeroDivisionError, lambda: f.prem(0))
+    pytest.raises(ZeroDivisionError, lambda: f.prem(R(0)))
 
     g = 2*x - 2*y
 
