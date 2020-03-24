@@ -7,8 +7,8 @@ from .densearith import (dmp_abs, dmp_add, dmp_add_mul, dmp_add_term, dmp_div,
                          dmp_sqr, dmp_sub, dmp_sub_mul, dup_lshift, dup_rshift)
 from .densebasic import (dmp_degree_in, dmp_degree_list, dmp_ground_LC,
                          dmp_ground_TC, dmp_LC, dmp_TC, dmp_to_dict)
-from .densetools import (dmp_compose, dmp_eval_tail, dmp_ground_monic,
-                         dup_decompose, dup_real_imag, dup_transform)
+from .densetools import (dmp_eval_tail, dmp_ground_monic, dup_decompose,
+                         dup_real_imag, dup_transform)
 from .euclidtools import dmp_resultant, dmp_zz_modular_resultant
 from .factortools import (dmp_factor_list, dmp_trial_division,
                           dmp_zz_diophantine, dmp_zz_mignotte_bound,
@@ -171,9 +171,6 @@ class IPolys:
 
     def dup_transform(self, f, p, q):
         return self.from_dense(dup_transform(self.to_dense(f), self.to_dense(p), self.to_dense(q), self.domain))
-
-    def dmp_compose(self, f, g):
-        return self.from_dense(dmp_compose(self.to_dense(f), self.to_dense(g), self.ngens-1, self.domain))
 
     def dup_decompose(self, f):
         components = dup_decompose(self.to_dense(f), self.domain)
