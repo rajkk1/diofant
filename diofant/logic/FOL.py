@@ -86,7 +86,7 @@ class Applied(FOL):
 
     def __init__(self, func, *args):
         if not args:
-            raise ValueError("Use a constant instead of %s()" % func)
+            raise ValueError(f'Use a constant instead of {func}')
         args = [arg if isinstance(arg, (Boolean, Symbol))
                 else Constant(arg) for arg in args]
         self._args = tuple(args)
@@ -271,7 +271,7 @@ class Quantifier(FOL):
         for x in expr.atoms(Quantifier):
             v = var.intersection(x.vars)
             if v:
-                raise ValueError("Variable %s is already bound" % tuple(v))
+                raise ValueError(f'Variable {tuple(v)} is already bound')
 
         var = var.intersection(expr.atoms())
         if not var:
@@ -882,9 +882,9 @@ class FOL_KB():
 
         def _validate(pred):
             if isinstance(pred, Not):
-                raise ValueError("Negative Predicate found: %s" % pred)
+                raise ValueError(f'Negative Predicate found: %s" % {pred}')
             if not isinstance(pred, AppliedPredicate):
-                raise ValueError("Invalid Predicate: %s" % pred)
+                raise ValueError(f'Invalid Predicate: {pred}')
 
         variables = clause.atoms()
         subs = {v: next(self.vars) for v in variables}

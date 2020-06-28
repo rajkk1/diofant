@@ -657,14 +657,14 @@ class StrPrinter(Printer):
         return expr.name
 
     def _print_Applied(self, expr):
-        return "%s(%s)" % (expr.name,
+        return '%s(%s)' % (expr.name,
                            ', '.join(self._print(arg) for arg in expr.args))
 
     def _print_Constant(self, expr):
         return str(expr.name)
 
     def _print_Quantifier(self, expr):
-        return "%s((%s), %s)" % (expr.func,
+        return '%s((%s), %s)' % (expr.func,
                                  ', '.join(self._print(v) for v in expr.vars),
                                  expr.expr)
 
