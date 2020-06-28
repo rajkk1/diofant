@@ -15,7 +15,6 @@ __all__ = ()
 @cacheit
 def _emptyfn():
     """Test docstring."""
-    pass
 
 
 @cacheit
@@ -24,8 +23,8 @@ def _identity(x):
 
 
 def test_cacheit_doc():
-    assert _emptyfn.__doc__ == "Test docstring."
-    assert _emptyfn.__name__ == "_emptyfn"
+    assert _emptyfn.__doc__ == 'Test docstring.'
+    assert _emptyfn.__name__ == '_emptyfn'
 
 
 def test_cacheit():
