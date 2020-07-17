@@ -137,7 +137,7 @@ def ratint_ratpart(f, g, x):
     f = Poly(f, x)
     g = Poly(g, x)
 
-    u, v, _ = g.cofactors(g.diff())
+    u, v, _ = g.cofactors(g.diff(x))
 
     n = u.degree()
     m = v.degree()
@@ -150,7 +150,7 @@ def ratint_ratpart(f, g, x):
     A = Poly(A_coeffs, x, domain=ZZ.inject(*C_coeffs))
     B = Poly(B_coeffs, x, domain=ZZ.inject(*C_coeffs))
 
-    H = f - A.diff()*v + A*(u.diff()*v).quo(u) - B*u
+    H = f - A.diff(x)*v + A*(u.diff()*v).quo(u) - B*u
 
     result = solve(H.coeffs(), C_coeffs)[0]
 

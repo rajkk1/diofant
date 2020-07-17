@@ -21,6 +21,7 @@ Compatibility breaks
 * Drop ``is_monic``, ``is_primitive``, ``zero``, ``one`` and ``unit`` attributes of :class:`~diofant.polys.polytools.Poly`, see :pull:`1036` and :pull:`1039`.
 * Drop ``sring()`` and ``poly_from_expr()`` functions, see :pull:`1037`.
 * Functions and classes of the :mod:`~diofant.polys.polytools` module do not support anymore iterables as polynomial generator, see :pull:`1039`.
+* ``diff()`` method of :class:`~diofant.polys.polytools.Poly` do not support specification of variables/orders with :class:`tuple`, see :pull:`1039`.
 
 Minor changes
 =============
@@ -52,3 +53,4 @@ These Sympy issues also were addressed:
 * :sympyissue:`19770` Limit involving cosine
 * :sympyissue:`19766` Incorrect limit
 * :sympyissue:`19774` evalf() doesn't evaluate terms in an exponential
+* :sympyissue:`19590` Poly.diff() doesn't support higher order derivatives
