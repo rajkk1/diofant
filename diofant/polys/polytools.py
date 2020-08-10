@@ -5,8 +5,8 @@ import operator
 
 import mpmath
 
-from ..core import (Add, Basic, Derivative, E, Expr, Integer, Mul, Tuple, oo,
-                    preorder_traversal, sympify)
+from ..core import (Add, Basic, Derivative, E, Expr, Integer, Mul, Tuple,
+                    expand_power_exp, oo, preorder_traversal, sympify)
 from ..core.compatibility import iterable
 from ..core.decorators import _sympifyit
 from ..core.mul import _keep_coeff
@@ -236,6 +236,8 @@ class Poly(Expr):
 
         if rep.is_Poly:
             return cls._from_poly(rep, opt)
+
+        rep = expand_power_exp(rep)
 
         if opt.expand is False:
             (rep,), opt = _parallel_dict_from_expr([rep], opt)
