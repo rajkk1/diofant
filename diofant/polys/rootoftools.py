@@ -51,7 +51,7 @@ class RootOf(Expr):
         Explicitly solve linear or quadratic polynomial
         equation (enabled by default).
     expand : bool, optional
-        Expand polynomial, enabled default.
+        Expand polynomial, disabled by default.
     evaluate : bool or None, optional
         Control automatic evaluation.
 
@@ -65,7 +65,7 @@ class RootOf(Expr):
 
     is_commutative = True
 
-    def __new__(cls, f, x, index=None, radicals=True, expand=True, evaluate=None):
+    def __new__(cls, f, x, index=None, radicals=True, expand=False, evaluate=None):
         """Construct a new ``RootOf`` object for ``k``-th root of ``f``."""
         x = sympify(x)
 

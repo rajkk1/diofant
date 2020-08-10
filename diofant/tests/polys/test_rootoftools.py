@@ -40,24 +40,24 @@ def test_RootOf___new__():
     r = RootOf(x**2 + 2*x + 3, -2, radicals=False)
     assert isinstance(r, RootOf) is True
 
-    assert RootOf((x - 1)*(x + 1), 0, radicals=False) == -1
-    assert RootOf((x - 1)*(x + 1), 1, radicals=False) == 1
-    assert RootOf((x - 1)*(x + 1), -1, radicals=False) == 1
-    assert RootOf((x - 1)*(x + 1), -2, radicals=False) == -1
+    assert RootOf((x - 1)*(x + 1), 0, radicals=False, expand=True) == -1
+    assert RootOf((x - 1)*(x + 1), 1, radicals=False, expand=True) == 1
+    assert RootOf((x - 1)*(x + 1), -1, radicals=False, expand=True) == 1
+    assert RootOf((x - 1)*(x + 1), -2, radicals=False, expand=True) == -1
 
-    assert RootOf((x - 1)*(x + 1), 0, radicals=True) == -1
-    assert RootOf((x - 1)*(x + 1), 1, radicals=True) == 1
-    assert RootOf((x - 1)*(x + 1), -1, radicals=True) == 1
-    assert RootOf((x - 1)*(x + 1), -2, radicals=True) == -1
+    assert RootOf((x - 1)*(x + 1), 0, radicals=True, expand=True) == -1
+    assert RootOf((x - 1)*(x + 1), 1, radicals=True, expand=True) == 1
+    assert RootOf((x - 1)*(x + 1), -1, radicals=True, expand=True) == 1
+    assert RootOf((x - 1)*(x + 1), -2, radicals=True, expand=True) == -1
 
-    assert RootOf((x - 1)*(x**3 + x + 3), 0) == RootOf(x**3 + x + 3, 0)
-    assert RootOf((x - 1)*(x**3 + x + 3), 1) == 1
-    assert RootOf((x - 1)*(x**3 + x + 3), 2) == RootOf(x**3 + x + 3, 1)
-    assert RootOf((x - 1)*(x**3 + x + 3), 3) == RootOf(x**3 + x + 3, 2)
-    assert RootOf((x - 1)*(x**3 + x + 3), -1) == RootOf(x**3 + x + 3, 2)
-    assert RootOf((x - 1)*(x**3 + x + 3), -2) == RootOf(x**3 + x + 3, 1)
-    assert RootOf((x - 1)*(x**3 + x + 3), -3) == 1
-    assert RootOf((x - 1)*(x**3 + x + 3), -4) == RootOf(x**3 + x + 3, 0)
+    assert RootOf((x - 1)*(x**3 + x + 3), 0, expand=True) == RootOf(x**3 + x + 3, 0)
+    assert RootOf((x - 1)*(x**3 + x + 3), 1, expand=True) == 1
+    assert RootOf((x - 1)*(x**3 + x + 3), 2, expand=True) == RootOf(x**3 + x + 3, 1)
+    assert RootOf((x - 1)*(x**3 + x + 3), 3, expand=True) == RootOf(x**3 + x + 3, 2)
+    assert RootOf((x - 1)*(x**3 + x + 3), -1, expand=True) == RootOf(x**3 + x + 3, 2)
+    assert RootOf((x - 1)*(x**3 + x + 3), -2, expand=True) == RootOf(x**3 + x + 3, 1)
+    assert RootOf((x - 1)*(x**3 + x + 3), -3, expand=True) == 1
+    assert RootOf((x - 1)*(x**3 + x + 3), -4, expand=True) == RootOf(x**3 + x + 3, 0)
 
     assert RootOf(x**4 + 3*x**3, 0) == -3
     assert RootOf(x**4 + 3*x**3, 1) == 0
@@ -214,11 +214,11 @@ def test_RootOf_conjugate():
     assert RootOf(p, 6).conjugate() == RootOf(p, 5)
 
     p2 = p*(x - 123)
-    assert RootOf(p2, 0).conjugate() == RootOf(p2, 0)
-    assert RootOf(p2, 1).conjugate() == RootOf(p2, 1)
-    assert RootOf(p2, 2).conjugate() == RootOf(p2, 3)
-    assert RootOf(p2, 3).conjugate() == RootOf(p2, 2)
-    assert RootOf(p2, 7).conjugate() == RootOf(p2, 6)
+    assert RootOf(p2, 0, expand=True).conjugate() == RootOf(p2, 0, expand=True)
+    assert RootOf(p2, 1, expand=True).conjugate() == RootOf(p2, 1, expand=True)
+    assert RootOf(p2, 2, expand=True).conjugate() == RootOf(p2, 3, expand=True)
+    assert RootOf(p2, 3, expand=True).conjugate() == RootOf(p2, 2, expand=True)
+    assert RootOf(p2, 7, expand=True).conjugate() == RootOf(p2, 6, expand=True)
 
     p3 = Poly(x**7 + x*y + 1, x)
     assert RootOf(p3, x, 0).conjugate() == conjugate(RootOf(p3, x, 0),

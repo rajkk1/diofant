@@ -176,8 +176,72 @@ class Poly(Expr):
     @classmethod
     def _from_expr(cls, rep, opt):
         """Construct a polynomial from an expression."""
-        (rep,), opt = _parallel_dict_from_expr([rep], opt)
-        return cls._from_dict(rep, opt)
+        def _poly(expr, opt):
+            terms, poly_terms = [], []
+
+            for term in Add.make_args(expr):
+                factors, poly_factors = [], []
+
+                for factor in Mul.make_args(term):
+                    if factor.is_Add:
+                        poly_factors.append(_poly(factor, opt))
+                    elif (factor.is_Pow and factor.base.is_Add and
+                          factor.exp.is_Integer and factor.exp >= 0):
+                        poly_factors.append(_poly(factor.base, opt)**factor.exp)
+                    else:
+                        factors.append(factor)
+
+                if not poly_factors:
+                    terms.append(term)
+                else:
+                    product = poly_factors[0]
+
+                    for factor in poly_factors[1:]:
+                        product *= factor
+
+                    if factors:
+                        factor = Mul(*factors)
+
+                        if factor.is_Number:
+                            product *= factor
+                        else:
+                            (factor,), _opt = _parallel_dict_from_expr([factor], opt)
+                            factor = cls._from_dict(factor, _opt)
+                            product *= factor
+
+                    poly_terms.append(product)
+
+            if not poly_terms:
+                (expr,), _opt = _parallel_dict_from_expr([expr], opt)
+                result = cls._from_dict(expr, _opt)
+            else:
+                result = poly_terms[0]
+
+                for term in poly_terms[1:]:
+                    result += term
+
+                if terms:
+                    term = Add(*terms)
+
+                    if term.is_Number:
+                        result += term
+                    else:
+                        (term,), _opt = _parallel_dict_from_expr([term], opt)
+                        term = cls._from_dict(term, _opt)
+                        result += term
+
+            return result.reorder(*opt.gens, sort=opt.sort, wrt=opt.wrt)
+
+        rep = sympify(rep)
+
+        if rep.is_Poly:
+            return cls._from_poly(rep, opt)
+
+        if opt.expand is False:
+            (rep,), opt = _parallel_dict_from_expr([rep], opt)
+            return cls._from_dict(rep, opt)
+        else:
+            return _poly(rep, opt.clone({'expand': False}))
 
     def _hashable_content(self):
         """Allow Diofant to hash Poly instances."""
@@ -2516,9 +2580,6 @@ def parallel_poly_from_expr(exprs, *gens, **args):
 
                 expr = expr.__class__._from_poly(expr, opt)
             else:
-                if opt.expand:
-                    expr = expr.expand()
-
                 try:
                     expr = Poly._from_expr(expr, opt)
                     _exprs.append(i)

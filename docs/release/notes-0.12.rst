@@ -59,3 +59,5 @@ These Sympy issues also were addressed:
 * :sympyissue:`14874` Limit x --> oo for besselk
 * :sympyissue:`19991` Wrong result from floor().evalf()
 * :sympyissue:`10666` resultant misses the sign
+* :sympyissue:`12531` cancel does not return expanded form
+* :sympyissue:`6322` degree((x+1)**10000) takes too long

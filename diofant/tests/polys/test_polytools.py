@@ -1124,6 +1124,11 @@ def test_Poly_degree():
     pytest.raises(ComputationFailed, lambda: degree(1))
 
 
+@pytest.mark.timeout(30)
+def test_sympyissue_6322():
+    assert degree((1 + x)**10000) == 10000
+
+
 def test_Poly_degree_list():
     assert [Poly(0, x, y).degree(_) for _ in (x, y)] == [-oo, -oo]
     assert [Poly(0, x, y, z).degree(_) for _ in (x, y, z)] == [-oo, -oo, -oo]
@@ -2652,6 +2657,12 @@ def test_cancel():
 
     assert cancel(((x - 1)**2/(x - 1), (x + 2*x**2)/x,
                    (x - x**3)/x)) == (x - 1, 2*x + 1, -x**2 + 1)
+
+    # issue sympy/sympy#12531
+    e = (x**4/24 - x*(x**3/24 + Rational(7, 8)) +
+         13*x/12) / ((x**3/24 + Rational(7, 8))*(-x**4/6 - x/3) +
+                     (x**3/6 - Rational(1, 2))*(x**4/24 + 13*x/12))
+    assert cancel(e) == Rational(-1, 4)
 
 
 def test_reduced():

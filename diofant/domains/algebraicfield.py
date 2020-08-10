@@ -35,6 +35,9 @@ class AlgebraicField(CharacteristicZero, SimpleDomain, Field):
         minpoly, coeffs, _ = primitive_element(ext, domain=dom)
         ext = sum(c*e for c, e in zip(coeffs, ext))
 
+        if minpoly.degree() < 2:
+            return dom
+
         is_real = ext.is_real
         if is_real is not False:
             ext_root = cls._compute_ext_root(ext, minpoly)
