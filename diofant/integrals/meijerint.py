@@ -1692,7 +1692,7 @@ def _meijerint_indefinite_1(f, x):
 
         """
         from ..polys import cancel
-        res = expand_mul(cancel(res), deep=False)
+        res = expand_mul(cancel(expand(res)), deep=False)
         return Add._from_args(res.as_coeff_add(x)[1])
 
     res = piecewise_fold(res)
