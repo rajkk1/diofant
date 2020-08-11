@@ -3,9 +3,9 @@ from collections import defaultdict
 import mpmath
 
 from ..core import (Add, Basic, Dummy, E, Expr, Float, I, Integer, Mul, Pow,
-                    Rational, Symbol, count_ops, expand_func, expand_log,
-                    expand_mul, expand_power_exp, factor_terms, oo, pi,
-                    sympify)
+                    Rational, Symbol, count_ops, expand, expand_func,
+                    expand_log, expand_mul, expand_power_exp, factor_terms, oo,
+                    pi, sympify)
 from ..core.compatibility import as_int, iterable
 from ..core.evaluate import global_evaluate
 from ..core.function import _coeff_isneg, _mexpand
@@ -613,7 +613,7 @@ def simplify(expr, ratio=1.7, measure=count_ops, fu=False):
 
     expr = bottom_up(expr, lambda w: w.normal())
     expr = Mul(*powsimp(expr).as_content_primitive())
-    _e = cancel(expr)
+    _e = cancel(expand(expr))
     expr1 = shorter(_e, _mexpand(_e).cancel())  # issue sympy/sympy#6829
     expr2 = shorter(together(expr, deep=True), together(expr1, deep=True))
 
