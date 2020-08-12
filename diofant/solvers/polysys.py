@@ -67,7 +67,7 @@ def solve_linear_system(system, *symbols, **flags):
 
     """
     eqs = system*Matrix(symbols + (-1,))
-    polys, opt = parallel_poly_from_expr(eqs, *symbols, field=True)
+    polys, opt = parallel_poly_from_expr([e.expand() for e in eqs], *symbols, field=True)
     domain = polys[0].rep.ring
     polys = [_.rep for _ in polys]
 
