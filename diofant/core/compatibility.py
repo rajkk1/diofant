@@ -174,6 +174,29 @@ if GROUND_TYPES == 'python':
     os.environ['MPMATH_NOGMPY'] = 'yes'
 
 
+if sys.version_info >= (3, 8):
+    from math import isqrt
+else:
+    def isqrt(n):
+        """Return the largest integer less than or equal to sqrt(n)."""
+        n = int(n)
+
+        if n < 0:
+            raise ValueError('n argument must be nonnegative')
+        if n == 0:
+            return 0
+
+        c = (n.bit_length() - 1) // 2
+        a = 1
+        d = 0
+        for s in reversed(range(c.bit_length())):
+            e = d
+            d = c >> s
+            a = (a << d - e - 1) + (n >> 2*c - e - d + 1) // a
+
+        return a - (a*a > n)
+
+
 if sys.version_info >= (3, 9):
     from math import gcd as igcd
     from math import lcm as ilcm

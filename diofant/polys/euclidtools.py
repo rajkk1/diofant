@@ -42,10 +42,22 @@ class _GCD:
             else:
                 return f, zero, one
 
+    def _euclid(self, f, g):
+        a, b = f.copy(), g.copy()
+
+        while b:
+            a, b = b, a % b
+
+        h = a.monic()
+
+        return h, f // h, g // h
+
     def _gcd(self, f, g):
         domain = self.domain
 
-        if domain.is_RationalField:
+        if domain.is_FiniteField:
+            return self._euclid(f, g)
+        elif domain.is_RationalField:
             return self._gcd_QQ(f, g)
         elif domain.is_IntegerRing:
             return self._gcd_ZZ(f, g)

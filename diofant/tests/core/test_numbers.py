@@ -13,9 +13,8 @@ from diofant import (Catalan, E, EulerGamma, Float, Ge, GoldenRatio, Gt, I,
                      integer_nthroot, latex, log, mod_inverse, nan, nextprime,
                      oo, pi, root, sin, sqrt, true, zoo)
 from diofant.core.cache import clear_cache
-from diofant.core.compatibility import igcd, ilcm
+from diofant.core.compatibility import igcd, ilcm, isqrt
 from diofant.core.numbers import igcdex, mpf_norm
-from diofant.core.power import isqrt
 
 
 __all__ = ()
@@ -871,7 +870,7 @@ def test_isqrt():
     assert int(_sqrt(limit)) == integer_nthroot(limit, 2)[0]
     assert int(_sqrt(limit + 1)) != integer_nthroot(limit + 1, 2)[0]
     assert isqrt(limit + 1) == integer_nthroot(limit + 1, 2)[0]
-    assert isqrt(limit + 1 + Rational(1, 2)) == integer_nthroot(limit + 1, 2)[0]
+    assert isqrt(int(limit + 1 + Rational(1, 2))) == integer_nthroot(limit + 1, 2)[0]
 
     # issue sympy/sympy#17034
     assert isqrt(4503599761588224) == 67108864
