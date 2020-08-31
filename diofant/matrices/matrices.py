@@ -3,8 +3,8 @@ import functools
 from types import FunctionType
 
 from ..core import (Add, Atom, Basic, Dummy, Expr, Float, I, Integer, Pow,
-                    Symbol, count_ops, ilcm, oo, symbols, sympify)
-from ..core.compatibility import as_int, is_sequence
+                    Symbol, count_ops, oo, symbols, sympify)
+from ..core.compatibility import as_int, ilcm, is_sequence
 from ..core.logic import fuzzy_and
 from ..functions import Max, Min, exp, factorial, sqrt
 from ..polys import PurePoly, cancel, gcd, roots

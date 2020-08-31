@@ -2,8 +2,8 @@ import functools
 
 import mpmath
 
-from ..core import igcd, prod
-from ..core.compatibility import as_int
+from ..core import prod
+from ..core.compatibility import as_int, igcd
 from ..core.numbers import igcdex
 from .primetest import isprime
 

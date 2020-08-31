@@ -7,7 +7,7 @@ import mpmath
 import mpmath.libmp as mlib
 
 from .cache import cacheit
-from .compatibility import GROUND_TYPES, HAS_GMPY, as_int, gmpy
+from .compatibility import GROUND_TYPES, HAS_GMPY, as_int, gmpy, ilcm
 from .containers import Tuple
 from .decorators import _sympifyit
 from .expr import AtomicExpr, Expr
@@ -94,51 +94,6 @@ def _str_to_Decimal_dps(s):
         raise ValueError(f'string-float not recognized: {s}')
     else:
         return num, len(num.as_tuple().digits)
-
-
-@cacheit
-def igcd(*args):
-    """Computes positive integer greatest common divisor.
-
-    Examples
-    ========
-
-    >>> igcd(2, 4)
-    2
-    >>> igcd(5, 10, 15)
-    5
-
-    """
-    args = map(as_int, args)
-    a = next(args)
-    for b in args:
-        if a == 1:
-            break
-        a = math.gcd(a, b)
-    return a
-
-
-def ilcm(*args):
-    """Computes integer least common multiple.
-
-    Examples
-    ========
-
-    >>> ilcm(5, 10)
-    10
-    >>> ilcm(7, 3)
-    21
-    >>> ilcm(5, 10, 15)
-    30
-
-    """
-    args = map(as_int, args)
-    a = next(args)
-    for b in args:
-        if a == 0:
-            break
-        a = a*b // math.gcd(a, b)
-    return a
 
 
 def igcdex(a, b):

@@ -1,9 +1,9 @@
 import math
 
-from ..core import (Add, Eq, Integer, Rational, Symbol, factor_terms, igcd,
-                    ilcm, integer_nthroot, oo, symbols, sympify)
+from ..core import (Add, Eq, Integer, Rational, Symbol, factor_terms,
+                    integer_nthroot, oo, symbols, sympify)
 from ..core.assumptions import check_assumptions
-from ..core.compatibility import as_int, is_sequence
+from ..core.compatibility import as_int, igcd, ilcm, is_sequence
 from ..core.function import _mexpand
 from ..core.numbers import igcdex
 from ..core.power import isqrt
@@ -51,7 +51,7 @@ def _remove_gcd(*x):
     try:
         g = igcd(*x)
         return tuple(i//g for i in x)
-    except ValueError:
+    except (TypeError, ValueError):
         return x
 
 

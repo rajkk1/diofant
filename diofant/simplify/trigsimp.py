@@ -6,8 +6,8 @@ from strategies.tree import greedy
 
 from ..core import (Add, Basic, Dummy, E, Expr, FunctionClass, I, Integer, Mul,
                     Pow, Rational, Wild, cacheit, count_ops, expand,
-                    expand_mul, factor_terms, igcd, symbols, sympify)
-from ..core.compatibility import iterable
+                    expand_mul, factor_terms, symbols, sympify)
+from ..core.compatibility import igcd, iterable
 from ..core.function import _mexpand
 from ..domains import ZZ
 from ..functions import cos, cosh, cot, coth, exp, sin, sinh, tan, tanh

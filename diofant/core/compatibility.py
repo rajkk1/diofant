@@ -4,7 +4,9 @@ we support. Also some functions that are needed Diofant-wide and are located
 here for easy import.
 """
 
+import math
 import os
+import sys
 
 from ..external import import_module
 
@@ -170,3 +172,50 @@ if GROUND_TYPES == 'gmpy' and not HAS_GMPY:
 
 if GROUND_TYPES == 'python':
     os.environ['MPMATH_NOGMPY'] = 'yes'
+
+
+if sys.version_info >= (3, 9):
+    from math import gcd as igcd
+    from math import lcm as ilcm
+else:
+    def igcd(*args):
+        """Computes positive integer greatest common divisor.
+
+        Examples
+        ========
+
+        >>> igcd(2, 4)
+        2
+        >>> igcd(5, 10, 15)
+        5
+
+        """
+        args = map(as_int, args)
+        a = next(args)
+        for b in args:
+            if a == 1:
+                break
+            a = math.gcd(a, b)
+        return a
+
+    def ilcm(*args):
+        """Computes integer least common multiple.
+
+        Examples
+        ========
+
+        >>> ilcm(5, 10)
+        10
+        >>> ilcm(7, 3)
+        21
+        >>> ilcm(5, 10, 15)
+        30
+
+        """
+        args = map(as_int, args)
+        a = next(args)
+        for b in args:
+            if a == 0:
+                break
+            a = a*b // math.gcd(a, b)
+        return a

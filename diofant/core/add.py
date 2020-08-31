@@ -3,9 +3,9 @@ import functools
 
 from ..utilities import default_sort_key
 from .cache import cacheit
-from .compatibility import is_sequence
+from .compatibility import igcd, ilcm, is_sequence
 from .logic import _fuzzy_group
-from .numbers import Integer, igcd, ilcm, nan, oo, zoo
+from .numbers import Integer, nan, oo, zoo
 from .operations import AssocOp
 
 

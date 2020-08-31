@@ -448,7 +448,7 @@ def _rewrite_gamma(f, s, a, b):
     (([], []), ([], []), 1/2, 1, 8)
 
     """
-    from ..core import igcd, ilcm
+    from ..core.compatibility import igcd, ilcm
     from ..functions import cos, cot, exp_polar, gamma, re, sin, tan
     from ..polys import Poly, RootOf, roots
 

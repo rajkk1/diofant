@@ -26,17 +26,17 @@ from diofant import (cos, cosh, cot, diff, dsolve, elliptic_e, elliptic_f, erf,
                      exp, expand, expand_func, eye, factor, factorial,
                      factorial2, factorint, fibonacci, floor,
                      fourier_transform, gamma, gcd, groebner, hessian, hyper,
-                     hyperexpand, igcd, im, integrate,
-                     inverse_laplace_transform, laplace_transform,
-                     legendre_poly, limit, log, logcombine, maximize,
-                     mellin_transform, minimize, nan, npartitions, oo, pi,
-                     polygamma, polylog, powdenest, powsimp, primerange,
-                     primitive, primitive_root, product, radsimp, re,
-                     reduce_inequalities, residue, resultant, rf, root, rsolve,
-                     sec, series, sign, simplify, sin, sinh, solve, sqrt,
-                     sqrtdenest, summation, symbols, tan, tanh, totient,
+                     hyperexpand, im, integrate, inverse_laplace_transform,
+                     laplace_transform, legendre_poly, limit, log, logcombine,
+                     maximize, mellin_transform, minimize, nan, npartitions,
+                     oo, pi, polygamma, polylog, powdenest, powsimp,
+                     primerange, primitive, primitive_root, product, radsimp,
+                     re, reduce_inequalities, residue, resultant, rf, root,
+                     rsolve, sec, series, sign, simplify, sin, sinh, solve,
+                     sqrt, sqrtdenest, summation, symbols, tan, tanh, totient,
                      trigsimp, trunc, wronskian, zeta, zoo)
 from diofant.abc import a, b, c, s, t, w, x, y, z
+from diofant.core.compatibility import igcd
 from diofant.functions.combinatorial.numbers import stirling
 from diofant.utilities.iterables import partitions
 

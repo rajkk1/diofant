@@ -1965,7 +1965,7 @@ class Poly(Expr):
             coeffs = [int(coeff) for coeff in self.all_coeffs()]
         elif self.domain is QQ:
             denoms = [coeff.denominator for coeff in self.all_coeffs()]
-            from ..core import ilcm
+            from ..core.compatibility import ilcm
             fac = ilcm(*denoms)
             coeffs = [int(coeff*fac) for coeff in self.all_coeffs()]
         else:

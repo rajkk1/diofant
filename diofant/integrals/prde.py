@@ -17,7 +17,8 @@ each function for more information.
 
 import functools
 
-from ..core import Add, Dummy, Integer, Mul, Pow, ilcm
+from ..core import Add, Dummy, Integer, Mul, Pow
+from ..core.compatibility import ilcm
 from ..matrices import Matrix, eye, zeros
 from ..polys import Poly, cancel, lcm, sqf_list
 from ..solvers import solve

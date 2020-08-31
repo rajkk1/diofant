@@ -866,7 +866,7 @@ def _rewrite_saxena(fac, po, g1, g2, x, full_pb=False):
     meijerg(((), ()), ((m/2,), (-m/2,)), t/4)
 
     """
-    from ..core.numbers import ilcm
+    from ..core.compatibility import ilcm
 
     def pb(g):
         a, b = _get_coeff_exp(g.argument, x)
