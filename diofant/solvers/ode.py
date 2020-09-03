@@ -3217,19 +3217,19 @@ def ode_Bernoulli(eq, func, order, match):
                     dx
         >>> pprint(dsolve(genform, f(x), hint='Bernoulli_Integral'),
         ...        use_unicode=False, wrap_line=False)
-                                                                                        1
-                                                                                      ------
-                                                                                      -n + 1
-               /                      /               /                             \\
-               |                      |              |                              ||
-               |             /        |              |              /               ||
-               |            |         |              |             |                ||
-               | -(-n + 1)* | P(x) dx |              |   (-n + 1)* | P(x) dx        ||
-               |            |         |              |             |                ||
-               |           /          |              |            /                 ||
-        f(x) = |E                    *|C1 + (n - 1)* | -E                   *Q(x) dx||
-               |                      |              |                              ||
-               \                      \             /                               //
+                                                                                                   1
+                                                                                                 ------
+                                                                                                 -n + 1
+               /                           /               /                                   \\
+               |                           |              |                                    ||
+               |     /            /        |              |        /           /               ||
+               |    |            |         |              |       |           |                ||
+               | n* | P(x) dx  - | P(x) dx |              |   -n* | P(x) dx   | P(x) dx        ||
+               |    |            |         |              |       |           |                ||
+               |   /            /          |              |      /           /                 ||
+        f(x) = |E            *E           *|C1 + (n - 1)* | -E             *E          *Q(x) dx||
+               |                           |              |                                    ||
+               \                           \             /                                     //
 
     Note that the equation is separable when `n = 1` (see the docstring of
     :py:meth:`~diofant.solvers.ode.ode_separable`).
