@@ -238,6 +238,7 @@ class Poly(Expr):
             return cls._from_poly(rep, opt)
 
         rep = expand_power_exp(rep)
+        rep = rep.replace(lambda e: e.is_Pow, lambda e: e.func(e.base, e.exp.expand()))
 
         if opt.expand is False:
             (rep,), opt = _parallel_dict_from_expr([rep], opt)
