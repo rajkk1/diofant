@@ -1414,9 +1414,9 @@ def test_1st_homogeneous_coeff_ode():
     eq8 = x + f(x) - (x - f(x))*f(x).diff(x)
     sol1 = Eq(log(x), C1 - log(f(x)*sin(f(x)/x)/x))
     sol2 = Eq(log(x), log(C1) + log(cos(f(x)/x) - 1)/2 - log(cos(f(x)/x) + 1)/2)
-    sol3 = Eq(f(x), -exp(C1)*LambertW(-x*exp(-C1 + 1)))
+    sol3 = Eq(f(x), -C1*LambertW(-E*x/C1))
     sol4 = Eq(log(f(x)), C1 - 2*exp(x/f(x)))
-    sol5 = Eq(f(x), exp(2*C1 + LambertW(-2*x**4*exp(-4*C1))/2)/x)
+    sol5 = Eq(f(x), E**(2*C1)*E**(LambertW(-2*E**(-4*C1)*x**4)/2)/x)
     sol6 = Eq(log(x),
               C1 + exp(-f(x)/x)*sin(f(x)/x)/2 + exp(-f(x)/x)*cos(f(x)/x)/2)
     sol7 = Eq(log(f(x)), C1 - 2*sqrt(-x/f(x) + 1))
@@ -1586,19 +1586,15 @@ def test_nth_linear_constant_coeff_homogeneous():
     sol3 = Eq(f(x), C1*exp(x) + C2*exp(-x))
     sol4 = Eq(f(x), C1 + C2*exp(-3*x) + C3*exp(2*x))
     sol5 = Eq(f(x), C1*exp(x/2) + C2*exp(4*x/3))
-    sol6 = Eq(f(x), C1*exp(x*(-1 + sqrt(2))) + C2*exp(x*(-sqrt(2) - 1)))
-    sol7 = Eq(f(x),
-              C1*exp(3*x) + C2*exp(x*(-2 - sqrt(2))) + C3*exp(x*(-2 + sqrt(2))))
+    sol6 = Eq(f(x), E**(-x)*(E**(sqrt(2)*x)*C2 + E**(-sqrt(2)*x)*C1))
+    sol7 = Eq(f(x), E**(3*x)*C1 + E**(-2*x)*(E**(sqrt(2)*x)*C3 + E**(-sqrt(2)*x)*C2))
     sol8 = Eq(f(x), C1 + C2*exp(x) + C3*exp(-2*x) + C4*exp(2*x))
-    sol9 = Eq(f(x),
-              C1*exp(x) + C2*exp(-x) + C3*exp(x*(-2 + sqrt(2))) +
-              C4*exp(x*(-2 - sqrt(2))))
+    sol9 = Eq(f(x), E**x*C2 + E**(-x)*C1 + E**(-2*x)*(E**(sqrt(2)*x)*C4 + E**(-sqrt(2)*x)*C3))
     sol10 = Eq(f(x),
                C1*sin(x*sqrt(a)) + C2*cos(x*sqrt(a)) + C3*exp(x*sqrt(a)) +
                C4*exp(-x*sqrt(a)))
-    sol11 = Eq(f(x),
-               C1*exp(x*(k - sqrt(k**2 + 2))) + C2*exp(x*(k + sqrt(k**2 + 2))))
-    sol12 = Eq(f(x), E**(-2*x*(k + 2*abs(k)))*C1 + E**(-2*x*(k - 2*abs(k)))*C2)
+    sol11 = Eq(f(x), E**(k*x)*(E**(x*sqrt(k**2 + 2))*C2 + E**(-x*sqrt(k**2 + 2))*C1))
+    sol12 = Eq(f(x), E**(-2*k*x)*(E**(4*x*abs(k))*C2 + E**(-4*x*abs(k))*C1))
     sol13 = Eq(f(x), C1 + C2*x + C3*x**2 + C4*x**3)
     sol14 = Eq(f(x), (C1 + C2*x)*exp(-2*x))
     sol15 = Eq(f(x), (C1 + C2*x)*exp(-x) + C3*exp(x/3))
@@ -2905,7 +2901,7 @@ def test_diofantissue_309():
 def test_sympyissue_10379():
     t, y = symbols('t,y')
     sol = dsolve(f(t).diff(t) - (1 - 51.05*y*f(t)))
-    ans = Eq(f(t), (0.019588638589618 + 0.019588638589618*E**(-1.0*y*(-1.0*C1 + 51.05*t)))/y)
+    ans = Eq(f(t), (0.019588638589618*E**(C1*y)*E**(-51.05*t*y) + 0.019588638589618)/y)
     assert str(sol) == str(ans)
 
 
