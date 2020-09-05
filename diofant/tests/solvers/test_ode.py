@@ -1231,7 +1231,7 @@ def test_1st_exact1():
     eq4 = cos(f(x)) - (x*sin(f(x)) - f(x)**2)*f(x).diff(x)
     eq5 = 2*x*f(x) + (x**2 + f(x)**2)*f(x).diff(x)
     sol1 = [Eq(f(x), -acos(C1/cos(x)) + 2*pi), Eq(f(x), acos(C1/cos(x)))]
-    sol2 = Eq(f(x), exp(C1 - x**2 + LambertW(-x*exp(-C1 + x**2))))
+    sol2 = Eq(f(x), E**(-x**2)*E**LambertW(-E**(x**2)*x/C1)*C1)
     sol2b = Eq(log(f(x)) + x/f(x) + x**2, C1)
     sol3 = Eq(f(x)*sin(x) + cos(f(x)) + x**2 + f(x)**2, C1)
     sol4 = Eq(x*cos(f(x)) + f(x)**3/3, C1)
