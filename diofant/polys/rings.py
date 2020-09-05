@@ -809,12 +809,6 @@ class PolyElement(DomainElement, CantSympify, dict):
         """Multiply other to self with other in the coefficient domain of self."""
         return self.__mul__(other)
 
-    def _sparsity(self):
-        from ..functions import binomial
-        ring = self.ring
-        d = self.total_degree()
-        return len(self)/int(binomial(ring.ngens + d, d)) if d > 0 else 1.0
-
     def __pow__(self, n, mod=None):
         """Raise polynomial to power `n`."""
         ring = self.ring
@@ -824,7 +818,7 @@ class PolyElement(DomainElement, CantSympify, dict):
             raise ValueError('negative exponent')
         elif not n:
             return ring.one
-        elif self._sparsity() > 0.2 or mod:
+        elif len(self) > 5 or mod:
             return self._pow_generic(n, mod)
         elif len(self) == 1:
             monom, coeff = list(self.items())[0]
