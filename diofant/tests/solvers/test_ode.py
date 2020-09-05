@@ -96,8 +96,8 @@ def test_linear_2eq_order1():
     assert dsolve(eq10) == sol10
 
     eq11 = (Eq(diff(x(t), t), f(t)*x(t) + g(t)*y(t)), Eq(diff(y(t), t), a*(f(t) + a*h(t))*x(t) + a*(g(t) - h(t))*y(t)))
-    sol11 = [Eq(x(t), exp(-Integral(-a*g(t) - f(t), t))*(C1 - Integral(-exp(-a*Integral(h(t), t))*exp(Integral(-a*g(t) - f(t), t))*C2*g(t), t))),
-             Eq(y(t), exp(-Integral(-a*g(t) - f(t), t))*a*(C1 - Integral(-exp(-a*Integral(h(t), t))*exp(Integral(-a*g(t) - f(t), t))*C2*g(t), t)) + exp(-a*Integral(g(t) - (a*g(t) - a*h(t))/a, t))*C1)]
+    sol11 = [Eq(x(t), E**(-Integral(-a*g(t), t))*E**(-Integral(-f(t), t))*(C1 - Integral(-E**(-a*Integral(h(t), t))*E**Integral(-a*g(t), t)*E**Integral(-f(t), t)*C2*g(t), t))),
+             Eq(y(t), E**(-Integral(-a*g(t), t))*E**(-Integral(-f(t), t))*a*(C1 - Integral(-E**(-a*Integral(h(t), t))*E**Integral(-a*g(t), t)*E**Integral(-f(t), t)*C2*g(t), t)) + E**(-a*Integral(g(t) - (a*g(t) - a*h(t))/a, t))*C1)]
     assert dsolve(eq11) == sol11
 
 
