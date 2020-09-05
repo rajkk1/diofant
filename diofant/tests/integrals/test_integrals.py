@@ -1008,8 +1008,8 @@ def test_sympyissue_4422():
 
 
 def test_sympyissue_4493():
-    assert simplify(integrate(x*sqrt(1 + 2*x), x)) == \
-        sqrt(2*x + 1)*(6*x**2 + x - 1)/15
+    assert (simplify(integrate(x*sqrt(1 + 2*x), x)) ==
+            (12*x**3 + 8*x**2 - x - 1)/(15*sqrt(2*x + 1)))
 
 
 def test_sympyissue_4737():
