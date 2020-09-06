@@ -67,7 +67,9 @@ class RootOf(Expr):
 
     def __new__(cls, f, x, index=None, radicals=True, expand=False, evaluate=None):
         """Construct a new ``RootOf`` object for ``k``-th root of ``f``."""
+        f = sympify(f)
         x = sympify(x)
+        f = f.doit()
 
         if index is None and x.is_Integer:
             x, index = None, x
