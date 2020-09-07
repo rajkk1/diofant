@@ -310,8 +310,8 @@ def test_sympyissue_7383():
     r = sqrt(x**2 + z**2)
     u = erf(a*r/sqrt(2))/r
     Ec = u.diff(z, z).subs({x: sqrt(R*R - z*z)})
-    assert integrate(Ec, (z, -R, R)).simplify() == \
-        -2*sqrt(2)*R*a**3*exp(-R**2*a**2/2)/(3*sqrt(pi))
+    assert (integrate(Ec, (z, -R, R)) +
+            2*sqrt(2)*R*a**3*exp(-R**2*a**2/2)/(3*sqrt(pi))).simplify() == 0
 
 
 def test_sympyissue_10161():
