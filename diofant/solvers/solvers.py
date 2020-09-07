@@ -514,7 +514,7 @@ def _solve(f, symbol, **flags):
         # as a polynomial, followed (perhaps) by a change of variables if the
         # generator is not a symbol
 
-        poly = Poly(f_num)
+        poly = Poly(f_num.expand())
         gens = [g for g in poly.gens if g.has(symbol)]
 
         def _as_base_q(x):
@@ -620,7 +620,7 @@ def _solve(f, symbol, **flags):
             # polys (e.g. for symbols other than the one we are interested
             # in) so recast the poly in terms of our generator of interest.
 
-            poly = Poly(f_num, gens[0], extension=False)
+            poly = Poly(f_num.expand(), gens[0], extension=False)
 
             # if we aren't on the tsolve-pass, use roots
             if not flags.pop('tsolve', False):
