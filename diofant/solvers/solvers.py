@@ -1121,7 +1121,7 @@ def _tsolve(eq, sym, **flags):
         # lambert forms may need some help being recognized, e.g. changing
         # 2**(3*x) + x**3*log(2)**3 + 3*x**2*log(2)**2 + 3*x*log(2) + 1
         # to 2**(3*x) + (x*log(2) + 1)**3
-        g = _filtered_gens(eq.as_poly(), sym)
+        g = _filtered_gens(eq.expand().as_poly(), sym)
         up_or_log = set()
         for gi in g:
             if gi.is_Pow and gi.base is E or isinstance(gi, log):
