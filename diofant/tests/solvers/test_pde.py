@@ -246,8 +246,7 @@ def test_pdsolve_all():
     assert sorted(sol) == keys
     assert sol['order'] == 1
     assert sol['default'] == '1st_linear_constant_coeff'
-    assert sol['1st_linear_constant_coeff'] == Eq(f(x, y),
-                                                  -x**2*y + x**2 + 2*x*y - 4*x - 2*y + F(x - y)*exp(-x/2 - y/2) + 6)
+    assert sol['1st_linear_constant_coeff'].expand().simplify() == Eq(f(x, y), -x**2*y + x**2 + 2*x*y - 4*x - 2*y + 6 + exp(-x/2)*exp(-y/2)*F(x - y))
 
 
 def test_pdsolve_variable_coeff():
