@@ -293,7 +293,7 @@ def heurisch(f, x, rewrite=False, hints=None, mappings=None, retries=3,
             terms |= set(hints)
 
     for g in set(terms):  # using copy of terms
-        terms |= components(cancel(g.diff(x)), x)
+        terms |= components(cancel(g.diff(x).expand()), x)
 
     # TODO: caching is significant factor for why permutations work at all. Change this.
     V = _symbols('x', len(terms))
