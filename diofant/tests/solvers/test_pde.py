@@ -210,7 +210,7 @@ def test_pde_1st_linear_constant_coeff():
 
     eq = (u.diff(x)/u) + (u.diff(y)/u) + 1 - (exp(x + y)/u)
     sol = pdsolve(eq)
-    assert sol == Eq(f(x, y), F(x - y)*exp(-x/2 - y/2) + exp(x + y)/3)
+    assert sol == Eq(f(x, y), exp(x)*exp(y)/3 + exp(-x/2)*exp(-y/2)*F(x - y))
     assert classify_pde(eq) == ('1st_linear_constant_coeff',
                                 '1st_linear_constant_coeff_Integral')
     assert checkpdesol(eq, sol)[0]
@@ -218,15 +218,15 @@ def test_pde_1st_linear_constant_coeff():
     eq = 2*u + -u.diff(x) + 3*u.diff(y) + sin(x)
     sol = pdsolve(eq)
     assert sol == Eq(f(x, y),
-                     F(3*x + y)*exp(x/5 - 3*y/5) - 2*sin(x)/5 - cos(x)/5)
+                     exp(x/5)*exp(-3*y/5)*F(3*x + y) - 2*sin(x)/5 - cos(x)/5)
     assert classify_pde(eq) == ('1st_linear_constant_coeff',
                                 '1st_linear_constant_coeff_Integral')
     assert checkpdesol(eq, sol)[0]
 
     eq = u + u.diff(x) + u.diff(y) + x*y
     sol = pdsolve(eq)
-    assert sol == Eq(f(x, y),
-                     -x*y + x + y + F(x - y)*exp(-x/2 - y/2) - 2)
+    assert sol == Eq(f(x, y), x + y + (x - y)**2/4 - (x + y)**2/4 - 2 +
+                     exp(-x/2)*exp(-y/2)*F(x - y))
     assert classify_pde(eq) == ('1st_linear_constant_coeff',
                                 '1st_linear_constant_coeff_Integral')
     assert checkpdesol(eq, sol)[0]
