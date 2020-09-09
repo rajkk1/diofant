@@ -584,7 +584,7 @@ def pde_1st_linear_constant_coeff(eq, func, order, match, solvefun):
     # Integral should remain as it is in terms of xi,
     # doit() should be done in _handle_Integral.
     genterm = (1/(b**2 + c**2))*Integral(
-        (1/expterm*e).subs(solvedict), (xi, b*x + c*y))
+        (1/expterm*e).subs(solvedict).expand(trig=True), (xi, b*x + c*y))
     return Eq(f(x, y), Subs(expterm*(functerm + genterm),
                             (eta, c*x - b*y), (xi, b*x + c*y)))
 
