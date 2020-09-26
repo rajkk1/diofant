@@ -7,7 +7,6 @@ import operator
 from ..ntheory import factorint, isprime, nextprime
 from ..ntheory.modular import symmetric_residue
 from ..utilities import subsets
-from .galoistools import dup_gf_factor_sqf
 from .polyconfig import query
 from .polyerrors import (CoercionFailed, DomainError, EvaluationFailed,
                          ExtraneousFactors)
@@ -157,7 +156,7 @@ class _Factor:
 
         a = f.max_norm()
         b = abs(f.LC)
-        n = sum(f.degree_list())
+        n = sum(f.degree(x) for x in self.gens)
 
         return domain.sqrt(domain(n + 1))*2**n*a*b
 
@@ -349,7 +348,8 @@ class _Factor:
 
         s, t, _ = self.clone(domain=p_domain).gcdex(g, h)
 
-        g, h, s, t = map(lambda x: x.set_domain(domain), (g, h, s, t))
+        g, h, s, t = map(operator.methodcaller('set_domain', domain),
+                         (g, h, s, t))
 
         for _ in range(1, d + 1):
             (g, h, s, t), m = self._zz_hensel_step(m, f, g, h, s, t), m**2
@@ -429,9 +429,8 @@ class _Factor:
             factors = []
 
             for g, n in f.sqf_list()[1]:
-                g = g.to_dense()
-                for h in dup_gf_factor_sqf(g, domain):
-                    factors.append((self.from_list(h), n))
+                for h in self._gf_factor_sqf(g):
+                    factors.append((h, n))
         elif domain.is_AlgebraicField:
             coeff, factors = self._aa_factor_trager(f)
         else:
@@ -721,7 +720,7 @@ class _Factor:
         if len(F) == 2:
             p_domain = domain.finite_field(p)
             p_ring = self.clone(domain=p_domain)
-            f, g = map(lambda _: _.set_domain(p_domain), F)
+            f, g = map(operator.methodcaller('set_domain', p_domain), F)
 
             s, t, _ = p_ring.gcdex(g, f)
 
@@ -753,7 +752,8 @@ class _Factor:
 
             for s, f in zip(S, F):
                 s = s.mul_monom((m,))
-                s, f = map(lambda _: _.set_domain(p_domain), (s, f))
+                s, f = map(operator.methodcaller('set_domain', p_domain),
+                           (s, f))
                 s = (s % f).set_domain(domain)
 
                 result.append(s)
@@ -1075,7 +1075,7 @@ class _Factor:
             s = S[0].eval(x=n - i, a=a)
             S.insert(0, s.trunc_ground(p))
 
-        d = max(f.degree_list()[1:])
+        d = max(f.degree(x) for x in self.gens[1:])
 
         for j, s, a in zip(range(2, n + 2), S, A):
             G, w = list(H), j - 1
@@ -1087,7 +1087,7 @@ class _Factor:
                 if J:
                     lc = lc.eject(*lc.ring.gens[:-len(J)])(*J)
                 lc = lc.trunc_ground(p)
-                h, lc = map(lambda _: _.set_ring(s_ring), (h, lc))
+                h, lc = map(operator.methodcaller('set_ring', s_ring), (h, lc))
                 lt = h.eject(*s_ring.gens[1:]).leading_term().inject()
                 H[i] = lc*s_ring.gens[0]**lt.degree() + h - lt
 
@@ -1299,8 +1299,6 @@ class _Factor:
         _gf_ddf_zassenhaus
 
         """
-        from .galoistools import dup_gf_random
-
         factors = [f]
         d = f.degree()
 
@@ -1312,7 +1310,7 @@ class _Factor:
         N = d // n
 
         while len(factors) < N:
-            r = self.from_list(dup_gf_random(2*n - 1, domain))
+            r = self._gf_random(2*n - 1)
 
             if p == 2:
                 h = r
@@ -1528,8 +1526,6 @@ class _Factor:
         _gf_ddf_shoup
 
         """
-        from .galoistools import dup_gf_random
-
         domain = self.domain
         q, p = domain.order, domain.characteristic
         N = f.degree()
@@ -1541,7 +1537,7 @@ class _Factor:
 
         factors, x = [f], self.gens[0]
 
-        r = self.from_list(dup_gf_random(N - 1, domain))
+        r = self._gf_random(N - 1)
 
         h = pow(x, q, f)
         H = self._gf_trace_map(r, h, x, n - 1, f)[1]
@@ -1583,3 +1579,51 @@ class _Factor:
             factors += self._gf_edf_shoup(factor, n)
 
         return _sort_factors(factors, multiple=False)
+
+    def _gf_factor_sqf(self, f):
+        """
+        Factor a square-free polynomial ``f`` in ``GF(q)[x]``.
+
+        Returns its complete factorization into irreducibles::
+
+                     f_1(x) f_2(x) ... f_d(x)
+
+        where each ``f_i`` is a monic polynomial and ``gcd(f_i, f_j) == 1``,
+        for ``i != j``.  The result is given as a list of factors of ``f``.
+
+        Square-free factors of ``f`` can be factored into irreducibles over
+        finite fields using three very different methods:
+
+        Berlekamp
+            efficient for very small values of order ``q`` (usually ``q < 25``)
+        Cantor-Zassenhaus
+            efficient on average input and with "typical" ``q``
+        Shoup-Kaltofen-Gathen
+            efficient with very large inputs and order
+
+        If you want to use a specific factorization method - set
+        ``GF_FACTOR_METHOD`` configuration option with one of ``"berlekamp"``,
+        ``"zassenhaus"`` or ``"shoup"`` values.
+
+        Examples
+        ========
+
+        >>> R, x = ring('x', FF(5))
+        >>> f = x**2 + 4*x + 3
+        >>> R._gf_factor_sqf(f)
+        [x + 1 mod 5, x + 3 mod 5]
+
+        References
+        ==========
+
+        * :cite:`Gathen1999modern`, chapter 14
+
+        """
+        _factor_methods = {
+            'berlekamp': self._gf_berlekamp,  # ``p`` : small
+            'zassenhaus': self._gf_zassenhaus,  # ``p`` : medium
+            'shoup': self._gf_shoup,      # ``p`` : large
+        }
+        method = query('GF_FACTOR_METHOD')
+
+        return _factor_methods[method](f)
