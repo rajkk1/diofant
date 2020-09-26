@@ -8,8 +8,8 @@ import collections
 import itertools
 
 from ..core import Integer, Symbol, cacheit
-from ..core.compatibility import iterable, ordered
-from ..utilities import numbered_symbols
+from ..core.compatibility import iterable
+from ..utilities import numbered_symbols, ordered
 from .boolalg import (And, Boolean, BooleanFunction, Implies, Not, Or,
                       conjuncts, disjuncts, eliminate_implications, false,
                       to_cnf, true)
