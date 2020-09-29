@@ -2736,7 +2736,7 @@ class Expr(Basic, EvalfMixin, metaclass=ManagedProperties):
         d = logx if logx else Dummy('logx')
 
         for t in self.lseries(x, logx=d):
-            t = t.expand().cancel()
+            t = t.cancel()
 
             is_zero = t.equals(0)
             if is_zero:
@@ -2797,6 +2797,8 @@ class Expr(Basic, EvalfMixin, metaclass=ManagedProperties):
             b, e = p[0].as_base_exp()
             if b == x:
                 return c, e
+            elif b == -x:
+                return c*(-1)**e, e
         if s.has(x):
             s = s.simplify()
         return s, Integer(0)

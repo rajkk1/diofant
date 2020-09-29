@@ -240,6 +240,11 @@ class Poly(Expr):
         rep = expand_power_exp(rep)
         rep = rep.replace(lambda e: e.is_Pow, lambda e: e.func(e.base, e.exp.expand()))
 
+        from ..series import Order
+
+        if rep.has(Order):
+            rep = rep.expand()
+
         if opt.expand is False:
             (rep,), opt = _parallel_dict_from_expr([rep], opt)
             return cls._from_dict(rep, opt)

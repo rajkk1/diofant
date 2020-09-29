@@ -410,7 +410,7 @@ def test_branch_cuts():
 
 
 def test_aseries_trig():
-    assert limitinf(1/log(atan(x)), x) == -1/(-log(pi) + log(2))
+    assert limitinf(1/log(atan(x)), x) == 1/log(pi/2)
     assert limitinf(1/acot(-x), x) == -oo
 
 
