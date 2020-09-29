@@ -235,7 +235,7 @@ def test_binomial_symbolic():
     X = Binomial('X', n, p)
     assert simplify(E(X)) == n*p == simplify(moment(X, 1))
     assert simplify(variance(X)) == n*p*(1 - p) == simplify(cmoment(X, 2))
-    assert simplify((skewness(X) - (1-2*p)/sqrt(n*p*(1-p)))) == 0
+    assert simplify(skewness(X) - (1-2*p)/sqrt(n*p*(1-p))) == 0
 
     # Test ability to change success/failure winnings
     H, T = symbols('H T')
