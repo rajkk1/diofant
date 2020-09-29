@@ -3399,10 +3399,10 @@ def ode_2nd_power_series_ordinary(eq, func, order, match):
 
     >>> eq = f(x).diff(x, 2) + f(x)
     >>> pprint(dsolve(eq, hint='2nd_power_series_ordinary'), use_unicode=False)
-              / 4    2    \        /   2    \
-              |x    x     |        |  x     |    / 6\
-    f(x) = C2*|-- - -- + 1| + C1*x*|- -- + 1| + O\x /
-              \24   2     /        \  6     /
+                      3            2       4
+                  C2*x         C1*x    C1*x     / 6\
+    f(x) = C2*x - ----- + C1 - ----- + ----- + O\x /
+                    6            2       24
 
     References
     ==========
@@ -3555,13 +3555,10 @@ def ode_2nd_power_series_regular(eq, func, order, match):
 
     >>> eq = x*(f(x).diff(x, 2)) + 2*(f(x).diff(x)) + x*f(x)
     >>> pprint(dsolve(eq), use_unicode=False)
-                                  /    6    4    2    \
-                                  |   x    x    x     |
-              /  4    2    \   C1*|- --- + -- - -- + 1|
-              | x    x     |      \  720   24   2     /    / 6\
-    f(x) = C2*|--- - -- + 1| + ------------------------ + O\x /
-              \120   6     /              x
-
+                           3       5            2       4
+           C2   C2*x   C2*x    C2*x         C1*x    C1*x     / 6\
+    f(x) = -- - ---- + ----- - ----- + C1 - ----- + ----- + O\x /
+           x     2       24     720           6      120
 
     References
     ==========
