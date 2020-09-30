@@ -237,13 +237,13 @@ def test_linear_2eq_order2():
     assert dsolve(eq7) == sol7
 
     eq8 = (Eq(diff(x(t), t, t), t*(4*x(t) + 9*y(t))), Eq(diff(y(t), t, t), t*(12*x(t) - 6*y(t))))
-    sol8 = ('[Eq(x(t), -sqrt(133)*((-sqrt(133) - 1)*(C2*(133*t**8/24 - t**3/6 + sqrt(133)*t**3/2 + 1) + '
-            'C1*t*(sqrt(133)*t**4/6 - t**3/12 + 1) + O(t**6)) - (-1 + sqrt(133))*(C2*(-sqrt(133)*t**3/6 - t**3/6 + 1) + '
-            'C1*t*(-sqrt(133)*t**3/12 - t**3/12 + 1) + O(t**6)) - 4*C2*(133*t**8/24 - t**3/6 + sqrt(133)*t**3/2 + 1) + '
-            '4*C2*(-sqrt(133)*t**3/6 - t**3/6 + 1) - 4*C1*t*(sqrt(133)*t**4/6 - t**3/12 + 1) + '
-            '4*C1*t*(-sqrt(133)*t**3/12 - t**3/12 + 1) + O(t**6))/3192), Eq(y(t), -sqrt(133)*(-C2*(133*t**8/24 - t**3/6 + '
-            'sqrt(133)*t**3/2 + 1) + C2*(-sqrt(133)*t**3/6 - t**3/6 + 1) - C1*t*(sqrt(133)*t**4/6 - t**3/12 + 1) + '
-            'C1*t*(-sqrt(133)*t**3/12 - t**3/12 + 1) + O(t**6))/266)]')
+    sol8 = ('[Eq(x(t), -sqrt(133)*((-sqrt(133) - 1)*(C2*t - C2*t**4/12 + '
+            'sqrt(133)*C2*t**5/6 + C1 + sqrt(133)*C1*t**3/2 - C1*t**3/6 + '
+            'O(t**6)) - (-1 + sqrt(133))*(C2*t - C2*t**4/12 - sqrt(133)*C2*t**4/12 +'
+            ' C1 - C1*t**3/6 - sqrt(133)*C1*t**3/6 + O(t**6)) - sqrt(133)*C2*t**4/3 -'
+            ' 2*sqrt(133)*C2*t**5/3 - 8*sqrt(133)*C1*t**3/3 + O(t**6))/3192), Eq(y(t),'
+            ' -sqrt(133)*(-sqrt(133)*C2*t**4/12 - sqrt(133)*C2*t**5/6 - '
+            '2*sqrt(133)*C1*t**3/3 + O(t**6))/266)]')
     assert sstr(dsolve(eq8)) == sol8
 
     eq9 = (Eq(diff(x(t), t, t), t*(4*diff(x(t), t) + 9*diff(y(t), t))), Eq(diff(y(t), t, t), t*(12*diff(x(t), t) - 6*diff(y(t), t))))
@@ -2779,62 +2779,58 @@ def test_2nd_power_series_ordinary():
     C1, C2 = symbols('C1 C2')
     eq = f(x).diff(x, 2) - x*f(x)
     assert classify_ode(eq) == ('2nd_power_series_ordinary',)
-    assert dsolve(eq) == Eq(f(x),
-                            C2*(x**3/6 + 1) + C1*x*(x**3/12 + 1) + O(x**6))
-    assert dsolve(eq, x0=-2) == Eq(f(x),
-                                   C2*((x + 2)**4/6 + (x + 2)**3/6 - (x + 2)**2 + 1)
-                                   + C1*(x + (x + 2)**4/12 - (x + 2)**3/3 + 2)
-                                   + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C2*x + C2*x**4/12 + C1 + C1*x**3/6 + O(x**6))
+    assert dsolve(eq, x0=-2) == Eq(f(x), C2 + 10*C2*x/3 + 4*C2*x**2 +
+                                   3*C2*x**3/2 + C2*x**4/6 + 2*C1/3 - C1*x +
+                                   C1*x**3 + C1*x**4/12 + O(x**6))
     assert dsolve(eq, n=2) == Eq(f(x), C2*x + C1 + O(x**2))
 
     eq = (1 + x**2)*(f(x).diff(x, 2)) + 2*x*(f(x).diff(x)) - 2*f(x)
     assert classify_ode(eq) == ('2nd_power_series_ordinary',)
-    assert dsolve(eq) == Eq(f(x), C2*(-x**4/3 + x**2 + 1) + C1*x
-                            + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C2*x + C1 + C1*x**2 - C1*x**4/3 + O(x**6))
 
     eq = f(x).diff(x, 2) + x*(f(x).diff(x)) + f(x)
     assert classify_ode(eq) == ('2nd_power_series_ordinary',)
-    assert dsolve(eq) == Eq(f(x), C2*(
-        x**4/8 - x**2/2 + 1) + C1*x*(-x**2/3 + 1) + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C2*x - C2*x**3/3 + C1 - C1*x**2/2 +
+                            C1*x**4/8 + O(x**6))
     # for coverage
     assert classify_ode(f(x).diff(x, 2) +
                         sin(x)*(f(x).diff(x)) + f(x)) == ()
 
     eq = f(x).diff(x, 2) + f(x).diff(x) - x*f(x)
     assert classify_ode(eq) == ('2nd_power_series_ordinary',)
-    assert dsolve(eq) == Eq(f(x), C2*(
-        -x**4/24 + x**3/6 + 1) + C1*x*(x**3/24 + x**2/6 - x/2
-                                       + 1) + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C2*x - C2*x**2/2 + C2*x**3/6 + C2*x**4/24 +
+                            C1 + C1*x**3/6 - C1*x**4/24 + O(x**6))
 
     eq = f(x).diff(x, 2) + x*f(x)
     assert classify_ode(eq) == ('2nd_power_series_ordinary',)
-    assert dsolve(eq, n=7) == Eq(f(x), C2*(
-        x**6/180 - x**3/6 + 1) + C1*x*(-x**3/12 + 1) + O(x**7))
+    assert dsolve(eq, n=7) == Eq(f(x), C2*x - C2*x**4/12 + C1 - C1*x**3/6 +
+                                 C1*x**6/180 + O(x**7))
 
 
 def test_2nd_power_series_regular():
     C1, C2 = symbols('C1 C2')
     eq = x**2*(f(x).diff(x, 2)) - 3*x*(f(x).diff(x)) + (4*x + 4)*f(x)
-    assert dsolve(eq) == Eq(f(x), C1*x**2*(-16*x**3/9 +
-                                           4*x**2 - 4*x + 1) + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C1*x**2 - C1*x**3 + C1*x**4 -
+                            16*C1*x**5/9 + O(x**6))
 
     eq = 4*x**2*(f(x).diff(x, 2)) - 8*x**2*(f(x).diff(x)) + (4*x**2 +
                                                              1)*f(x)
-    assert dsolve(eq) == Eq(f(x), C1*sqrt(x)*(
-        x**4/24 + x**3/6 + x**2/2 + x + 1) + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C1*sqrt(x) + C1*sqrt(x)**3 + C1*sqrt(x)**5/2 +
+                            C1*sqrt(x)**7/6 + C1*sqrt(x)**9/24 + O(x**6))
 
-    eq = x**2*(f(x).diff(x, 2)) - x**2*(f(x).diff(x)) + (
-        x**2 - 2)*f(x)
-    assert dsolve(eq) == Eq(f(x), C1*(-x**6/720 - 3*x**5/80 - x**4/8 +
-                                      x**2/2 + x/2 + 1)/x + C2*x**2*(-x**3/60 + x**2/20 + x/2 + 1)
-                            + O(x**6))
+    eq = x**2*(f(x).diff(x, 2)) - x**2*(f(x).diff(x)) + (x**2 - 2)*f(x)
+    assert dsolve(eq) == Eq(f(x), C2*x**2 + C2*x**3/2 + C2*x**4/20 -
+                            C2*x**5/60 + C1/x + C1 + C1*x - C1*x**3/8 -
+                            3*C1*x**4/80 - C1*x**5/720 + O(x**6))
 
     eq = x**2*(f(x).diff(x, 2)) + x*(f(x).diff(x)) + (x**2 - Rational(1, 4))*f(x)
-    assert dsolve(eq) == Eq(f(x), C1*(x**4/24 - x**2/2 + 1)/sqrt(x) +
-                            C2*sqrt(x)*(x**4/120 - x**2/6 + 1) + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C2*sqrt(x) - C2*sqrt(x)**5/6 +
+                            C2*sqrt(x)**9/120 + C1/sqrt(x) - C1*sqrt(x)**3/2 +
+                            C1*sqrt(x)**7/24 + O(x**6))
 
     eq = x*(f(x).diff(x, 2)) - f(x).diff(x) + 4*x**3*f(x)
-    assert dsolve(eq) == Eq(f(x), C2*(-x**4/2 + 1) + C1*x**2 + O(x**6))
+    assert dsolve(eq) == Eq(f(x), C2*x**2 + C1 - C1*x**4/2 + O(x**6))
 
     eq = x**3*(f(x).diff(x, 2)) - 3*x*(f(x).diff(x)) + (4*x + 4)*f(x)
     assert '2nd_power_series_regular' not in classify_ode(eq, init={f(0): 1})
