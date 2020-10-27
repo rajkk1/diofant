@@ -369,8 +369,9 @@ def test_primitive_element():
 
     # issue sympy/sympy#14117
     assert (primitive_element([I*sqrt(2*sqrt(2) + 3), I*sqrt(-2*sqrt(2) + 3), I]) ==
-            (PurePoly(x**4 + 54*x**2 + 81), [1, 2, 4], [[QQ(1, 3), 0], [QQ(1, 27), 0, 2, 0],
-                                                        [QQ(-1, 54), 0, QQ(-5, 6), 0]]))
+            (PurePoly(x**4 + 6*x**2 + 1), [Rational(1, 3), Rational(2, 3),
+                                           Rational(4, 3)],
+             [[1, 0], [1, 0, 6, 0], [QQ(-1, 2), 0, QQ(-5, 2), 0]]))
 
 
 def test_field_isomorphism():
@@ -414,23 +415,23 @@ def test_field_isomorphism():
 
     assert field_isomorphism(f, e) == [QQ(3, 80), 0, -QQ(139, 80), 0, QQ(347, 20), 0, -QQ(761, 20), -5]
 
-    assert field_isomorphism(QQ.algebraic_field(+I*sqrt(3)), QQ.algebraic_field(I*sqrt(3)/2)) == [QQ(+1, 2), 0]
-    assert field_isomorphism(QQ.algebraic_field(-I*sqrt(3)), QQ.algebraic_field(I*sqrt(3)/2)) == [QQ(-1, 2), 0]
+    assert field_isomorphism(QQ.algebraic_field(+I*sqrt(3)), QQ.algebraic_field(I*sqrt(3)/2)) == [+1, 0]
+    assert field_isomorphism(QQ.algebraic_field(-I*sqrt(3)), QQ.algebraic_field(I*sqrt(3)/2)) == [-1, 0]
 
-    assert field_isomorphism(QQ.algebraic_field(+I*sqrt(3)), QQ.algebraic_field(-I*sqrt(3)/2)) == [QQ(-1, 2), 0]
-    assert field_isomorphism(QQ.algebraic_field(-I*sqrt(3)), QQ.algebraic_field(-I*sqrt(3)/2)) == [QQ(+1, 2), 0]
+    assert field_isomorphism(QQ.algebraic_field(+I*sqrt(3)), QQ.algebraic_field(-I*sqrt(3)/2)) == [-1, 0]
+    assert field_isomorphism(QQ.algebraic_field(-I*sqrt(3)), QQ.algebraic_field(-I*sqrt(3)/2)) == [+1, 0]
 
-    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7), QQ.algebraic_field(5*I*sqrt(3)/3)) == [QQ(+14, 5), 0]
-    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7), QQ.algebraic_field(5*I*sqrt(3)/3)) == [QQ(-14, 5), 0]
+    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7), QQ.algebraic_field(5*I*sqrt(3)/3)) == [+2, 0]
+    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7), QQ.algebraic_field(5*I*sqrt(3)/3)) == [-2, 0]
 
-    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [QQ(-14, 5), 0]
-    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [QQ(+14, 5), 0]
+    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [-2, 0]
+    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [+2, 0]
 
-    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7 + 27), QQ.algebraic_field(5*I*sqrt(3)/3)) == [QQ(+14, 5), 1323]
-    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7 + 27), QQ.algebraic_field(5*I*sqrt(3)/3)) == [QQ(-14, 5), 1323]
+    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7 + 27), QQ.algebraic_field(5*I*sqrt(3)/3)) == [+2, 189]
+    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7 + 27), QQ.algebraic_field(5*I*sqrt(3)/3)) == [-2, 189]
 
-    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7 + 27), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [QQ(-14, 5), 1323]
-    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7 + 27), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [QQ(+14, 5), 1323]
+    assert field_isomorphism(QQ.algebraic_field(+2*I*sqrt(3)/7 + 27), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [-2, 189]
+    assert field_isomorphism(QQ.algebraic_field(-2*I*sqrt(3)/7 + 27), QQ.algebraic_field(-5*I*sqrt(3)/3)) == [+2, 189]
 
     p = QQ.algebraic_field(+sqrt(2) + sqrt(3))
     q = QQ.algebraic_field(-sqrt(2) + sqrt(3))

@@ -18,6 +18,7 @@ from ..utilities.iterables import uniq
 from .orthopolys import chebyshevt_poly
 from .polyconfig import query
 from .polyerrors import NotAlgebraic
+from .polyroots import _integer_basis
 from .polytools import (Poly, PurePoly, degree, factor_list, groebner, lcm,
                         parallel_poly_from_expr, resultant)
 from .rootoftools import RootOf
@@ -706,10 +707,22 @@ def primitive_element(extension, **args):
 
     _, g = PurePoly(g).clear_denoms(convert=True)
 
+    if domain == QQ:
+        div = _integer_basis(g)
+        if div:
+            _, g = g.compose(Poly(g.gen*div)).primitive()
+            coeffs = [Integer(c)/div for c in coeffs]
+            H = [list(reversed([c*div**n for n, c in enumerate(reversed(h))])) for h in H]
+
     if g.LC() != 1:
-        H = [list(reversed([c/g.LC()**n for n, c in enumerate(reversed(h))])) for h in H]
-        coeffs = [c*g.LC() for c in coeffs]
-        g = (g.compose(Poly(g.gen/g.LC()))*g.LC()**g.degree()//g.LC()).retract()
+        for d in divisors(g.LC())[1:]:  # pragma: no branch
+            new_g = g.compose(Poly(g.gen/d))*d**g.degree()//d
+            _, new_g = new_g.monic().clear_denoms(convert=True)
+            if new_g.LC() == 1:
+                g = new_g
+                H = [list(reversed([c/d**n for n, c in enumerate(reversed(h))])) for h in H]
+                coeffs = [c*d for c in coeffs]
+                break
 
     return g, list(coeffs), H
 
