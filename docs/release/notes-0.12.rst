@@ -25,7 +25,7 @@ Compatibility breaks
 * Drop support for ``from_list()`` initialization for multivariate polynomials, see :pull:`1035`.
 * Drop ``to_dense()``, ``tail_degrees()``, ``almosteq()`` and ``degree_list()`` methods and ``is_monic``, ``is_primitive`` attributes of :class:`~diofant.polys.rings.PolyElement`, see :pull:`1035`, :pull:`1036` and :pull:`1051`.
 * Drop ``is_monic``, ``is_primitive``, ``zero``, ``one`` and ``unit`` attributes and ``degree_list()`` method of :class:`~diofant.polys.polytools.Poly`, see :pull:`1036`, :pull:`1039` and :pull:`1051`.
-* Drop ``sring()``, ``poly_from_expr()`` and ``gcd_list()`` functions, see :pull:`1037` and :pull:`1057`.
+* Drop ``sring()``, ``poly_from_expr()``, ``gcd_list()`` and ``lcm_list()`` functions, see :pull:`1037`, :pull:`1057` and :pull:`1086`.
 * Functions and classes of the :mod:`~diofant.polys.polytools` module do not support anymore iterables as polynomial generator, see :pull:`1039`.
 * Drop unused functions ``dispersion()``, ``dispersionset()`` and ``degree_list()``, see :pull:`1051` and :pull:`1053`.
 
@@ -41,6 +41,7 @@ Developer changes
 
 * Depend on `flake8-sfs <https://github.com/peterjc/flake8-sfs>`_, see :pull:`983`.
 * Depend on `mypy <http://mypy-lang.org/>`_, see :pull:`1022`.
+* Drop dependency on strategies, see :pull:`1074`.
 
 Issues closed
 =============
@@ -62,5 +63,13 @@ These Sympy issues also were addressed:
 * :sympyissue:`14874` Limit x --> oo for besselk
 * :sympyissue:`19991` Wrong result from floor().evalf()
 * :sympyissue:`10666` resultant misses the sign
+* :sympyissue:`20163` Apart hangs with extension=[sqrt(3), I]
+* :sympyissue:`9479` Cannot solve multivariate inequalities
+* :sympyissue:`20365` Limit Bug
+* :sympyissue:`20360` Incorrect definite integration of simple exponential involving pi
+* :sympyissue:`20389` TypeError: Argument of Integer should be of numeric type, got -oo
+* :sympyissue:`20391` Linear programming with simplex method
+* :sympyissue:`19161` When applying simplify on a Poly it fails
+* :sympyissue:`20397` bug in dividing polynomials by module
 * :sympyissue:`12531` cancel does not return expanded form
 * :sympyissue:`6322` degree((x+1)**10000) takes too long
