@@ -164,6 +164,10 @@ class UnivarPolynomialRing(PolynomialRing, _FindRoot):
         return J
 
 
+class UnivarPolynomialRingFF(UnivarPolynomialRing):
+    """A class for representing univariate polynomial rings over FF(p)."""
+
+
 class UnivarPolyElement(PolyElement):
     """Element of univariate distributed polynomial ring."""
 
@@ -395,3 +399,51 @@ class UnivarPolyElement(PolyElement):
         mid -= (lo + hi)
 
         return lo + mid.mul_monom((n2,)) + hi.mul_monom((2*n2,))
+
+
+class UnivarPolyElementFF(UnivarPolyElement):
+    """Element of univariate distributed polynomial ring over FF(p)."""
+
+    def __divmod__(self, other):
+        ring = self.ring
+        domain = ring.domain
+
+        if not other:
+            raise ZeroDivisionError('polynomial division')
+        elif isinstance(other, ring.dtype):
+            df = self.degree()
+            dg = other.degree()
+
+            if df < dg:
+                return ring.zero, self
+
+            K, p = domain.domain, domain.mod
+            inv = K.invert(other.LC.rep, p)
+
+            h, dq, dr = self.all_coeffs(), df - dg, dg - 1
+            h = list(map(lambda x: x.rep, h))
+
+            for i in range(df + 1):
+                coeff = self.coeff((df - i,)).rep
+
+                for j in range(max(0, dg - i), min(df - i, dr) + 1):
+                    coeff -= h[i + j - dg] * other.coeff((j,)).rep
+
+                if i <= dq:
+                    coeff *= inv
+
+                h[i] = coeff % p
+
+            return ring.from_list(h[:dq + 1]), ring.from_list(h[dq + 1:])
+        elif isinstance(other, PolyElement):
+            if isinstance(ring.domain, PolynomialRing) and ring.domain.ring == other.ring:
+                pass
+            else:
+                return NotImplemented
+
+        try:
+            other = ring.domain_new(other)
+        except CoercionFailed:
+            return NotImplemented
+        else:
+            return self.quo_ground(other), self.trunc_ground(other)
