@@ -428,7 +428,7 @@ class UnivarPolyElementFF(UnivarPolyElement):
         ring = self.ring
         domain = ring.domain
 
-        if isinstance(other, ring.dtype):
+        if isinstance(other, ring.dtype) and not other.is_zero:
             df = self.degree()
             dg = other.degree()
 

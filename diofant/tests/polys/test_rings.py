@@ -1451,6 +1451,15 @@ def test_PolyElement_misc_ariths():
 
 
 def test_PolyElement___floordiv__truediv__():
+    R, x = ring('x', FF(5))
+
+    f, g = x**2 + 2*x + 3, R(0)
+
+    pytest.raises(ZeroDivisionError, lambda: divmod(f, g))
+    pytest.raises(ZeroDivisionError, lambda: f % g)
+    pytest.raises(ZeroDivisionError, lambda: f // g)
+    pytest.raises(ZeroDivisionError, lambda: f.exquo(g))
+
     R, x = ring('x', ZZ)
 
     f, g = x**2 + 2*x + 3, R(0)
