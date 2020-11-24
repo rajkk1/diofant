@@ -92,7 +92,7 @@ class PolynomialRing(_GCD, Ring, CompositeDomain, _SQF, _Factor, _test_polys):
         elif domain.is_FiniteField and (domain.characteristic == domain.order):
             new_cls = UnivarPolynomialRingFF
         else:
-            UnivarPolynomialRing
+            new_cls = UnivarPolynomialRing
 
         key = new_cls.__name__, symbols, ngens, domain, order
         obj = _ring_cache.get(key)

@@ -167,6 +167,25 @@ class UnivarPolynomialRing(PolynomialRing, _FindRoot):
 class UnivarPolynomialRingFF(UnivarPolynomialRing):
     """A class for representing univariate polynomial rings over FF(p)."""
 
+    def from_list(self, element, _raw=False):
+        domain = self.domain
+        if not _raw:
+            return self.from_dict({(i,): c for i, c in enumerate(reversed(element))})
+        else:
+            poly = self.zero
+            for i, c in enumerate(reversed(element)):
+                new_coeff = domain.dtype(c, _raw=True)
+                if new_coeff:
+                    poly[(i,)] = new_coeff
+            return poly
+
+    def _cofactors(self, f, g):
+        while g:
+            f, g = g, f % g
+        h = f.monic()
+
+        return h, f // h, g // h
+
 
 class UnivarPolyElement(PolyElement):
     """Element of univariate distributed polynomial ring."""
@@ -422,19 +441,20 @@ class UnivarPolyElementFF(UnivarPolyElement):
 
             h, dq, dr = self.all_coeffs(), df - dg, dg - 1
             h = list(map(lambda x: x.rep, h))
+            f, g = h.copy(), list(map(lambda x: x.rep, other.all_coeffs()))
 
             for i in range(df + 1):
-                coeff = self.coeff((df - i,)).rep
+                coeff = f[i]
 
                 for j in range(max(0, dg - i), min(df - i, dr) + 1):
-                    coeff -= h[i + j - dg] * other.coeff((j,)).rep
+                    coeff -= h[i + j - dg] * g[dg - j]
 
                 if i <= dq:
                     coeff *= inv
 
                 h[i] = coeff % p
 
-            return ring.from_list(h[:dq + 1]), ring.from_list(h[dq + 1:])
+            return ring.from_list(h[:dq + 1], _raw=True), ring.from_list(h[dq + 1:], _raw=True)
         elif isinstance(other, PolyElement):
             if isinstance(ring.domain, PolynomialRing) and ring.domain.ring == other.ring:
                 pass
@@ -447,3 +467,69 @@ class UnivarPolyElementFF(UnivarPolyElement):
             return NotImplemented
         else:
             return self.quo_ground(other), self.trunc_ground(other)
+
+    def __mul__(self, other):
+        ring = self.ring
+        domain = ring.domain
+
+        if isinstance(other, ring.dtype):
+            df = self.degree()
+            dg = other.degree()
+
+            f = list(map(lambda x: x.rep, self.all_coeffs()))
+            g = list(map(lambda x: x.rep, other.all_coeffs()))
+
+            dh = df + dg
+            if dh < 0:
+                return ring.zero
+
+            h = [domain.domain.zero]*(dh + 1)
+            p = domain.mod
+
+            for i in range(0, dh + 1):
+                coeff = domain.domain.zero
+
+                for j in range(max(0, i - dg), min(i, df) + 1):
+                    coeff += f[j]*g[i - j]
+
+                h[i] = coeff % p
+
+            return ring.from_list(h, _raw=True)
+
+        return super().__mul__(other)
+
+    def _square(self):
+        ring = self.ring
+        domain = ring.domain
+        p = domain.mod
+        K = domain.domain
+        df = self.degree()
+
+        dh = 2*df
+        if dh < 0:
+            return self
+        h = [0]*(dh + 1)
+        f = list(map(lambda x: x.rep, self.all_coeffs()))
+
+        for i in range(0, dh + 1):
+            coeff = K.zero
+
+            jmin = max(0, i - df)
+            jmax = min(i, df)
+
+            n = jmax - jmin + 1
+
+            jmax = jmin + n // 2 - 1
+
+            for j in range(jmin, jmax + 1):
+                coeff += f[j]*f[i - j]
+
+            coeff += coeff
+
+            if n & 1:
+                elem = f[jmax + 1]
+                coeff += elem**2
+
+            h[i] = coeff % p
+
+        return ring.from_list(h, _raw=True)
