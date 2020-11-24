@@ -180,9 +180,10 @@ class UnivarPolynomialRingFF(UnivarPolynomialRing):
             return poly
 
     def _gcd(self, f, g):
-        while g:
-            f, g = g, f % g
-        h = f.monic()
+        a, b = f, g
+        while b:
+            a, b = b, a % b
+        h = a.monic()
 
         return h, f // h, g // h
 
@@ -427,9 +428,7 @@ class UnivarPolyElementFF(UnivarPolyElement):
         ring = self.ring
         domain = ring.domain
 
-        if not other:
-            raise ZeroDivisionError('polynomial division')
-        elif isinstance(other, ring.dtype):
+        if isinstance(other, ring.dtype):
             df = self.degree()
             dg = other.degree()
 
@@ -455,18 +454,8 @@ class UnivarPolyElementFF(UnivarPolyElement):
                 h[i] = coeff % p
 
             return ring.from_list(h[:dq + 1], _raw=True), ring.from_list(h[dq + 1:], _raw=True)
-        elif isinstance(other, PolyElement):
-            if isinstance(ring.domain, PolynomialRing) and ring.domain.ring == other.ring:
-                pass
-            else:
-                return NotImplemented
 
-        try:
-            other = ring.domain_new(other)
-        except CoercionFailed:
-            return NotImplemented
-        else:
-            return self.quo_ground(other), self.trunc_ground(other)
+        return super().__divmod__(other)
 
     def __mul__(self, other):
         ring = self.ring
