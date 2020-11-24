@@ -179,7 +179,7 @@ class UnivarPolynomialRingFF(UnivarPolynomialRing):
                     poly[(i,)] = new_coeff
             return poly
 
-    def _cofactors(self, f, g):
+    def _gcd(self, f, g):
         while g:
             f, g = g, f % g
         h = f.monic()
