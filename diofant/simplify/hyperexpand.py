@@ -703,9 +703,8 @@ class Formula:
 
         m = eye(n)
         m = m.col_insert(0, zeros(n, 1))
-        l = poly.all_coeffs()[1:]
-        l.reverse()
-        self.M = m.row_insert(n, -Matrix([l])/poly.all_coeffs()[0])
+        l = poly.all_coeffs()[:-1]
+        self.M = m.row_insert(n, -Matrix([l])/poly.LC())
 
     def __init__(self, func, z, res, symbols, B=None, C=None, M=None):
         z = sympify(z)
@@ -750,7 +749,7 @@ class Formula:
                 symbol_values.append(bq)
             else:
                 raise ValueError('At least one of the parameters of the '
-                                 'formula must be equal to %s' % (a,))
+                                 f'formula must be equal to {(a,)}')
         base_repl = [dict(zip(self.symbols, values))
                      for values in product(*symbol_values)]
         abuckets, bbuckets = [sift(params, _mod1) for params in [ap, bq]]
@@ -959,7 +958,6 @@ class Operator:
 
         """
         coeffs = self._poly.all_coeffs()
-        coeffs.reverse()
         diffs = [obj]
         for c in coeffs[1:]:
             diffs.append(op(diffs[-1]))
@@ -986,7 +984,7 @@ class ShiftA(Operator):
         self._poly = Poly(_x/ai + 1, _x)
 
     def __str__(self):
-        return '<Increment upper %s.>' % sstr(1/self._poly.all_coeffs()[0])
+        return f'<Increment upper {sstr(1/self._poly.LC())}.>'
 
 
 class ShiftB(Operator):
@@ -999,7 +997,7 @@ class ShiftB(Operator):
         self._poly = Poly(_x/(bi - 1) + 1, _x)
 
     def __str__(self):
-        return '<Decrement lower %s.>' % sstr(1/self._poly.all_coeffs()[0] + 1)
+        return f'<Decrement lower {sstr(1/self._poly.LC() + 1)}.>'
 
 
 class UnShiftA(Operator):
@@ -1034,13 +1032,13 @@ class UnShiftA(Operator):
             raise ValueError('Cannot decrement upper index: '
                              'cancels with lower')
 
-        n = Poly(Poly(n.all_coeffs()[:-1], A).as_expr().subs({A: _x/ai + 1}), _x)
+        n = Poly(Poly(n.all_coeffs()[1:], A).as_expr().subs({A: _x/ai + 1}), _x)
 
         self._poly = Poly((n - m)/b0, _x)
 
     def __str__(self):
-        return '<Decrement upper index #%s of %s, %s.>' % (sstr(self._i),
-                                                           sstr(self._ap), sstr(self._bq))
+        return (f'<Decrement upper index #{sstr(self._i)} of '
+                f'{sstr(self._ap)}, {sstr(self._bq)}.>')
 
 
 class UnShiftB(Operator):
@@ -1075,13 +1073,13 @@ class UnShiftB(Operator):
         if b0 == 0:
             raise ValueError('Cannot increment index: cancels with upper')
 
-        n = Poly(Poly(n.all_coeffs()[:-1], B).as_expr().subs({B: _x/(bi - 1) + 1}), _x)
+        n = Poly(Poly(n.all_coeffs()[1:], B).as_expr().subs({B: _x/(bi - 1) + 1}), _x)
 
         self._poly = Poly((m - n)/b0, _x)
 
     def __str__(self):
-        return '<Increment lower index #%s of %s, %s.>' % (sstr(self._i),
-                                                           sstr(self._ap), sstr(self._bq))
+        return (f'<Increment lower index #{sstr(self._i)} of '
+                f'{sstr(self._ap)}, {sstr(self._bq)}.>')
 
 
 class MeijerShiftA(Operator):
@@ -1092,7 +1090,7 @@ class MeijerShiftA(Operator):
         self._poly = Poly(bi - _x, _x)
 
     def __str__(self):
-        return '<Increment upper b=%s.>' % sstr(self._poly.all_coeffs()[1])
+        return f'<Increment upper b={sstr(self._poly.all_coeffs()[-2])}.>'
 
 
 class MeijerShiftB(Operator):
@@ -1103,7 +1101,7 @@ class MeijerShiftB(Operator):
         self._poly = Poly(1 - bi + _x, _x)
 
     def __str__(self):
-        return '<Decrement upper a=%s.>' % sstr(1 - self._poly.all_coeffs()[1])
+        return f'<Decrement upper a={sstr(1 - self._poly.all_coeffs()[-2])}.>'
 
 
 class MeijerShiftC(Operator):
@@ -1114,7 +1112,7 @@ class MeijerShiftC(Operator):
         self._poly = Poly(-bi + _x, _x)
 
     def __str__(self):
-        return '<Increment lower b=%s.>' % sstr(-self._poly.all_coeffs()[1])
+        return f'<Increment lower b={sstr(-self._poly.all_coeffs()[-2])}.>'
 
 
 class MeijerShiftD(Operator):
@@ -1125,7 +1123,7 @@ class MeijerShiftD(Operator):
         self._poly = Poly(bi - 1 - _x, _x)
 
     def __str__(self):
-        return '<Decrement lower a=%s.>' % sstr(self._poly.all_coeffs()[1] + 1)
+        return f'<Decrement lower a={sstr(self._poly.all_coeffs()[-2] + 1)}.>'
 
 
 class MeijerUnShiftA(Operator):
@@ -1165,13 +1163,14 @@ class MeijerUnShiftA(Operator):
         if b0 == 0:
             raise ValueError('Cannot decrement upper b index (cancels)')
 
-        n = Poly(Poly(n.all_coeffs()[:-1], A).as_expr().subs({A: bi - _x}), _x)
+        n = Poly(Poly(n.all_coeffs()[1:], A).as_expr().subs({A: bi - _x}), _x)
 
         self._poly = Poly((m - n)/b0, _x)
 
     def __str__(self):
-        return '<Decrement upper b index #%s of %s, %s, %s, %s.>' % (sstr(self._i),
-                                                                     sstr(self._an), sstr(self._ap), sstr(self._bm), sstr(self._bq))
+        return (f'<Decrement upper b index #{sstr(self._i)} of '
+                f'{sstr(self._an)}, {sstr(self._ap)}, {sstr(self._bm)},'
+                f' {sstr(self._bq)}.>')
 
 
 class MeijerUnShiftB(Operator):
@@ -1211,13 +1210,14 @@ class MeijerUnShiftB(Operator):
         if b0 == 0:
             raise ValueError('Cannot increment upper a index (cancels)')
 
-        n = Poly(Poly(n.all_coeffs()[:-1], B).as_expr().subs({B: 1 - ai + _x}), _x)
+        n = Poly(Poly(n.all_coeffs()[1:], B).as_expr().subs({B: 1 - ai + _x}), _x)
 
         self._poly = Poly((m - n)/b0, _x)
 
     def __str__(self):
-        return '<Increment upper a index #%s of %s, %s, %s, %s.>' % (sstr(self._i),
-                                                                     sstr(self._an), sstr(self._ap), sstr(self._bm), sstr(self._bq))
+        return (f'<Increment upper a index #{sstr(self._i)} of '
+                f'{sstr(self._an)}, {sstr(self._ap)}, {sstr(self._bm)}, '
+                f'{sstr(self._bq)}.>')
 
 
 class MeijerUnShiftC(Operator):
@@ -1263,13 +1263,14 @@ class MeijerUnShiftC(Operator):
         if b0 == 0:
             raise ValueError('Cannot decrement lower b index (cancels)')
 
-        n = Poly(Poly(n.all_coeffs()[:-1], C).as_expr().subs({C: _x - bi}), _x)
+        n = Poly(Poly(n.all_coeffs()[1:], C).as_expr().subs({C: _x - bi}), _x)
 
         self._poly = Poly((m - n)/b0, _x)
 
     def __str__(self):
-        return '<Decrement lower b index #%s of %s, %s, %s, %s.>' % (sstr(self._i),
-                                                                     sstr(self._an), sstr(self._ap), sstr(self._bm), sstr(self._bq))
+        return (f'<Decrement lower b index #{sstr(self._i)} of '
+                f'{sstr(self._an)}, {sstr(self._ap)}, {sstr(self._bm)},'
+                f' {sstr(self._bq)}.>')
 
 
 class MeijerUnShiftD(Operator):
@@ -1312,13 +1313,14 @@ class MeijerUnShiftD(Operator):
         if b0 == 0:
             raise ValueError('Cannot increment lower a index (cancels)')
 
-        n = Poly(Poly(n.all_coeffs()[:-1], B).as_expr().subs({B: ai - 1 - _x}), _x)
+        n = Poly(Poly(n.all_coeffs()[1:], B).as_expr().subs({B: ai - 1 - _x}), _x)
 
         self._poly = Poly((m - n)/b0, _x)
 
     def __str__(self):
-        return '<Increment lower a index #%s of %s, %s, %s, %s.>' % (sstr(self._i),
-                                                                     sstr(self._an), sstr(self._ap), sstr(self._bm), sstr(self._bq))
+        return (f'<Increment lower a index #{sstr(self._i)} of '
+                f'{sstr(self._an)}, {sstr(self._ap)}, {sstr(self._bm)},'
+                f' {sstr(self._bq)}.>')
 
 
 class ReduceOrder(Operator):
@@ -1383,8 +1385,8 @@ class ReduceOrder(Operator):
         return cls._meijer(1 - a, 1 - b, 1)
 
     def __str__(self):
-        return '<Reduce order by cancelling upper %s with lower %s.>' % \
-            (sstr(self._a), sstr(self._b))
+        return (f'<Reduce order by cancelling upper {sstr(self._a)}'
+                f' with lower {sstr(self._b)}.>')
 
 
 def _reduce_order(ap, bq, gen, key):
@@ -1881,13 +1883,12 @@ def build_hypergeometric_formula(func):
         for k in range(n):
             derivs.append(M*derivs[k])
         l = poly.all_coeffs()
-        l.reverse()
         res = [0]*n
         for k, c in enumerate(l):
             for r, d in enumerate(C*derivs[k]):
                 res[r] += c*d
         for k, c in enumerate(res):
-            M[n - 1, k] = -c/derivs[n - 1][0, n - 1]/poly.all_coeffs()[0]
+            M[n - 1, k] = -c/derivs[n - 1][0, n - 1]/poly.LC()
         return Formula(func, z, None, [], B, C, M)
     else:
         # Since there are no `ap`, none of the `bq` can be non-positive
