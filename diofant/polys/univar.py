@@ -170,10 +170,10 @@ class UnivarPolynomialRingFF(UnivarPolynomialRing):
     def from_list(self, element, _raw=False):
         domain = self.domain
         if not _raw:
-            return self.from_dict({(i,): c for i, c in enumerate(reversed(element))})
+            return self.from_dict({(i,): c for i, c in enumerate(element)})
         else:
             poly = self.zero
-            for i, c in enumerate(reversed(element)):
+            for i, c in enumerate(element):
                 new_coeff = domain.dtype(c, _raw=True)
                 if new_coeff:
                     poly[(i,)] = new_coeff
@@ -438,22 +438,22 @@ class UnivarPolyElementFF(UnivarPolyElement):
             K, p = domain.domain, domain.mod
             inv = K.invert(other.LC.rep, p)
 
-            h, dq, dr = self.all_coeffs(), df - dg, dg - 1
-            h = list(map(lambda x: x.rep, h))
-            f, g = h.copy(), list(map(lambda x: x.rep, other.all_coeffs()))
+            dq, dr = df - dg, dg - 1
+            f = list(map(lambda x: x.rep, self.all_coeffs()))
+            g = list(map(lambda x: x.rep, other.all_coeffs()))
 
-            for i in range(df + 1):
+            for i in range(df, -1, -1):
                 coeff = f[i]
 
-                for j in range(max(0, dg - i), min(df - i, dr) + 1):
-                    coeff -= h[i + j - dg] * g[dg - j]
+                for j in range(max(0, i - dq), min(i, dr) + 1):
+                    coeff -= f[i - j + dg] * g[j]
 
-                if i <= dq:
+                if i >= dg:
                     coeff *= inv
 
-                h[i] = coeff % p
+                f[i] = coeff % p
 
-            return ring.from_list(h[:dq + 1], _raw=True), ring.from_list(h[dq + 1:], _raw=True)
+            return ring.from_list(f[-dq - 1:], _raw=True), ring.from_list(f[:dr + 1], _raw=True)
 
         return super().__divmod__(other)
 
