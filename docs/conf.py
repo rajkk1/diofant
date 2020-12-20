@@ -32,6 +32,9 @@ napoleon_google_docstring = False
 napoleon_use_param = False
 napoleon_use_rtype = False
 
+# List our *.bib files.
+bibtex_bibfiles = ['sources.bib']
+
 # Sphinx will warn about all references where the target cannot be found.
 nitpicky = True
 
@@ -64,7 +67,7 @@ latex_use_xindy = False
 # This value determines how to group the document tree into LaTeX source
 # files.  It must be a list of tuples (startdocname, targetname, title,
 # author, documentclass, toctree_only),
-latex_documents = [('index', 'diofant.tex', 'Diofant Documentation',
+latex_documents = [('index', 'Diofant-' + version + '.tex', 'Diofant Documentation',
                     'Diofant Development Team', 'manual', True)]
 
 # A dictionary that contains LaTeX snippets that override predefined.

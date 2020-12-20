@@ -35,7 +35,7 @@ __all__ = ('Poly', 'PurePoly', 'parallel_poly_from_expr',
            'degree', 'LC', 'LM', 'LT', 'prem',
            'div', 'rem', 'quo', 'exquo', 'half_gcdex', 'gcdex',
            'invert', 'subresultants', 'resultant', 'discriminant', 'cofactors',
-           'gcd', 'lcm_list', 'lcm', 'terms_gcd', 'trunc',
+           'gcd', 'lcm', 'terms_gcd', 'trunc',
            'monic', 'content', 'primitive', 'compose', 'decompose',
            'sqf_norm', 'sqf_part', 'sqf_list', 'sqf',
            'factor_list', 'factor', 'count_roots',
@@ -639,7 +639,7 @@ class Poly(Expr):
         ========
 
         >>> Poly(x**3 + 2*x - 1).all_coeffs()
-        [1, 0, 2, -1]
+        [-1, 2, 0, 1]
 
         """
         return [self.domain.to_expr(c) for c in self.rep.all_coeffs()]
@@ -1982,7 +1982,7 @@ class Poly(Expr):
         try:
             # We need to add extra precision to guard against losing accuracy.
             # 10 times the degree of the polynomial seems to work well.
-            roots = mpmath.polyroots(coeffs, maxsteps=maxsteps,
+            roots = mpmath.polyroots(list(reversed(coeffs)), maxsteps=maxsteps,
                                      cleanup=cleanup, error=False,
                                      extraprec=self.degree()*10)
 
@@ -3057,67 +3057,6 @@ def gcd(f, g, *gens, **args):
         return result
 
 
-def lcm_list(seq, *gens, **args):
-    """
-    Compute LCM of a list of polynomials.
-
-    Examples
-    ========
-
-    >>> lcm_list([x**3 - 1, x**2 - 1, x**2 - 3*x + 2])
-    x**5 - x**4 - 2*x**3 - x**2 + x + 2
-
-    """
-    seq = sympify(seq)
-
-    def try_non_polynomial_lcm(seq):
-        if not gens and not args:
-            domain, numbers = construct_domain(seq)
-
-            if not numbers:
-                return domain.one
-            elif domain.is_Numerical:
-                result, numbers = numbers[0], numbers[1:]
-
-                for number in numbers:
-                    result = domain.lcm(result, number)
-
-                return domain.to_expr(result)
-
-    result = try_non_polynomial_lcm(seq)
-
-    if result is not None:
-        return result
-
-    allowed_flags(args, ['polys'])
-
-    try:
-        polys, opt = parallel_poly_from_expr(seq, *gens, **args)
-    except PolificationFailed as exc:
-        result = try_non_polynomial_lcm(exc.exprs)
-
-        if result is not None:
-            return result
-        else:
-            raise ComputationFailed('lcm_list', len(seq), exc)
-
-    if not polys:
-        if not opt.polys:
-            return Integer(1)
-        else:
-            return Poly(1, opt=opt)
-
-    result, polys = polys[0], polys[1:]
-
-    for poly in polys:
-        result = result.lcm(poly)
-
-    if not opt.polys:
-        return result.as_expr()
-    else:
-        return result
-
-
 def lcm(f, g, *gens, **args):
     """
     Compute LCM of ``f`` and ``g``.
@@ -3682,13 +3621,13 @@ def to_rational_coeffs(f):
         n = f.degree()
         lc = f.LC()
         f1 = f1 or f1.monic()
-        coeffs = f1.all_coeffs()[1:]
+        coeffs = f1.all_coeffs()[:-1]
         coeffs = [simplify(coeffx) for coeffx in coeffs]
-        if coeffs[-2]:
-            rescale1_x = simplify(coeffs[-2]/coeffs[-1])
+        if coeffs[1]:
+            rescale1_x = simplify(coeffs[1]/coeffs[0])
             coeffs1 = []
             for i in range(len(coeffs)):
-                coeffx = simplify(coeffs[i]*rescale1_x**(i + 1))
+                coeffx = simplify(coeffs[n - i - 1]*rescale1_x**(i + 1))
                 if not coeffx.is_rational:
                     break
                 coeffs1.append(coeffx)
@@ -3717,8 +3656,8 @@ def to_rational_coeffs(f):
             return
         n = f.degree()
         f1 = f1 or f1.monic()
-        coeffs = f1.all_coeffs()[1:]
-        c = simplify(coeffs[0])
+        coeffs = f1.all_coeffs()[:-1]
+        c = simplify(coeffs[-1])
         if c and not c.is_rational:
             func = Add
             if c.is_Add:

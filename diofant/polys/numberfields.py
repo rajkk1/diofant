@@ -341,7 +341,7 @@ def _minpoly_sin(ex, x):
             # write sin(q*a) = mp(sin(a))*sin(a);
             # the roots of mp(x) are sin(pi*p/q) for p = 1,..., q - 1
             a = chebyshevt_poly(n, polys=True).all_coeffs()
-            return Add(*[x**(n - i - 1)*a[i] for i in range(n)])
+            return Add(*[x**(n - i - 1)*a[n - i] for i in range(n)])
         if c.numerator == 1:
             if q == 9:
                 return 64*x**6 - 96*x**4 + 36*x**2 - 3
@@ -351,7 +351,7 @@ def _minpoly_sin(ex, x):
             # sin(q*a) = 0 to see that the minimal polynomial must be
             # a factor of chebyshevt_poly(n)
             a = chebyshevt_poly(n, polys=True).all_coeffs()
-            a = [x**(n - i)*a[i] for i in range(n + 1)]
+            a = [x**(n - i)*a[n - i] for i in range(n + 1)]
             r = Add(*a)
             _, factors = factor_list(r)
             res = _choose_factor(factors, x, ex)
@@ -385,7 +385,7 @@ def _minpoly_cos(ex, x):
         # for a = pi*p/q, cos(q*a) =T_q(cos(a)) = (-1)**p
         n = int(c.denominator)
         a = chebyshevt_poly(n, polys=True).all_coeffs()
-        a = [x**(n - i)*a[i] for i in range(n + 1)]
+        a = [x**(n - i)*a[n - i] for i in range(n + 1)]
         r = Add(*a) - (-1)**c.numerator
         _, factors = factor_list(r)
         return _choose_factor(factors, x, ex)
@@ -712,7 +712,7 @@ def primitive_element(extension, **args):
         if div:
             _, g = g.compose(Poly(g.gen*div)).primitive()
             coeffs = [Integer(c)/div for c in coeffs]
-            H = [list(reversed([c*div**n for n, c in enumerate(reversed(h))])) for h in H]
+            H = [[c*div**n for n, c in enumerate(h)] for h in H]
 
     if g.LC() != 1:
         for d in divisors(g.LC())[1:]:  # pragma: no branch
@@ -720,7 +720,7 @@ def primitive_element(extension, **args):
             _, new_g = new_g.monic().clear_denoms(convert=True)
             if new_g.LC() == 1:
                 g = new_g
-                H = [list(reversed([c/d**n for n, c in enumerate(reversed(h))])) for h in H]
+                H = [[c/d**n for n, c in enumerate(h)] for h in H]
                 coeffs = [c*d for c in coeffs]
                 break
 

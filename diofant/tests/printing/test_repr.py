@@ -57,9 +57,9 @@ def test_Function():
 
 
 def test_Geometry():
-    sT(Point(0, 0), 'Point2D(Integer(0), Integer(0))')
+    sT(Point(0, 0), 'Point(Integer(0), Integer(0))')
     sT(Ellipse(Point(0, 0), 5, 1),
-       'Ellipse(Point2D(Integer(0), Integer(0)), Integer(5), Integer(1))')
+       'Ellipse(Point(Integer(0), Integer(0)), Integer(5), Integer(1))')
     # TODO more tests
 
 
@@ -116,10 +116,10 @@ def test_Factors():
 def test_AlgebraicElement():
     K = QQ.algebraic_field(sqrt(2))
     a = K.unit
-    sT(a, f'AlgebraicField({QQ!r}, Pow(Integer(2), Rational(1, 2)))([Integer(1), Integer(0)])')
+    sT(a, f'AlgebraicField({QQ!r}, Pow(Integer(2), Rational(1, 2)))([Integer(0), Integer(1)])')
     K = QQ.algebraic_field(root(-2, 3))
     a = K.unit
-    sT(a, f'AlgebraicField({QQ!r}, Pow(Integer(-2), Rational(1, 3)))([Integer(1), Integer(0)])')
+    sT(a, f'AlgebraicField({QQ!r}, Pow(Integer(-2), Rational(1, 3)))([Integer(0), Integer(1)])')
 
 
 def test_Float():
