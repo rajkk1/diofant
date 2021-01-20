@@ -187,7 +187,7 @@ def test_sympyissue_3560():
 
 
 def test_integrate_poly():
-    p = Poly(x + x**2*y + y**3, x, y)
+    p = (x + x**2*y + y**3).as_poly()
 
     qx = integrate(p, x)
     qy = integrate(p, y)
@@ -203,7 +203,7 @@ def test_integrate_poly():
 
 
 def test_integrate_poly_defined():
-    p = Poly(x + x**2*y + y**3, x, y)
+    p = (x + x**2*y + y**3).as_poly()
 
     Qx = integrate(p, (x, 0, 1))
     Qy = integrate(p, (y, 0, pi))
@@ -1153,10 +1153,6 @@ def test_sympyissue_8945():
     assert integrate(cos(x)**2/x**2, x) == -Si(2*x) - cos(2*x)/(2*x) - 1/(2*x)
 
 
-def test_diofantissue_303():
-    assert integrate((cos(x)/x)**2, (x, pi, 2*pi)) == Si(2*pi) - Si(4*pi) + 1/pi/2
-
-
 @pytest.mark.slow
 def test_sympyissue_7130():
     integrand = (cos(pi*i*x/L)**2 / (a + b*x)).rewrite(exp)
@@ -1216,6 +1212,11 @@ def test_definite_integrals_abs():
     assert integrate(e, (x, -3, 11)) == 3136
     assert integrate(e, (x, -17, -2)) == Rational(-78425, 4)
     assert integrate(e, (x, -17, 20)) == Rational(74481, 4)
+
+
+def test_definite_integrals_other():
+    # issue diofant/diofant#303
+    assert integrate((cos(x)/x)**2, (x, pi, 2*pi)) == Si(2*pi) - Si(4*pi) + 1/pi/2
 
 
 def test_sympyissue_12081():
