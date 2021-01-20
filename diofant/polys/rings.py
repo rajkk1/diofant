@@ -1,7 +1,6 @@
 """Sparse polynomial rings."""
 
 import functools
-import math
 import operator
 import typing
 
