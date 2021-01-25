@@ -108,6 +108,10 @@ def test_basic4():
     l = Limit(Piecewise((x, x > 1), (0, True)), x, -1)
     assert l.doit() == l
 
+    # issue sympy/sympy#16714
+    e = ((n**(n + 1) + (n + 1)**n)/n**(n + 1))**n
+    assert limit(e, n, oo) == E**E
+
 
 def test_basic5():
     class MyFunction(Function):
@@ -652,11 +656,6 @@ def test_sympyissue_16222():
     assert limit(exp(x), x, 1000000000) == exp(1000000000)
 
 
-def test_sympyissue_16714():
-    e = ((n**(n + 1) + (n + 1)**n)/n**(n + 1))**n
-    assert limit(e, n, oo) == E**E
-
-
 @pytest.mark.timeout(20)
 def test_sympyissue_15282():
     assert limit((x**2000 - (x + 1)**2000)/x**1999, x, oo) == -2000
@@ -798,3 +797,7 @@ def test_sympyissue_14874():
 
 def test_sympyissue_20365():
     assert limit(((x + 1)**(1/x) - E)/x, x, 0) == -E/2
+
+
+def test_sympyissue_20704():
+    assert limit(x*(abs(1/x + y) - abs(y - 1/x))/2, x, 0) == 0

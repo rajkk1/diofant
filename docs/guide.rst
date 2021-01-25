@@ -66,7 +66,8 @@ All work should be submitted via `Pull Requests (PR)`_.
       or adding comment with issue number).
    2. All new functionality should be tested, every new line
       should be covered by tests.  Please use in tests only
-      public interfaces.
+      public interfaces.  Regression tests are not accounted in
+      the coverage statistics.
    3. Optionally, provide doctests to illustrate usage.  But keep in
       mind, doctests are not tests.  Think of them as examples that
       happen to be tested.
@@ -89,12 +90,6 @@ All work should be submitted via `Pull Requests (PR)`_.
        python setup.py build_sphinx -W
 
    and check that it looks as expected.
-
-9. If you add new references, please run
-
-       python setup.py build_sphinx
-
-   twice and update the ``docs/bibtex.json``.
 
 Rosetta Stone
 =============
