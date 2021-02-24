@@ -9,6 +9,8 @@ in `diofant.utilities.codegen`.  The `codegen` module can be used to generate
 complete source code files.
 """
 
+from __future__ import annotations
+
 import re
 import typing
 
@@ -59,7 +61,7 @@ class OctaveCodePrinter(CodePrinter):
         'not': '~',
     }
 
-    _default_settings: typing.Dict[str, typing.Any] = {
+    _default_settings: dict[str, typing.Any] = {
         'order': None,
         'full_prec': 'auto',
         'precision': 16,
@@ -283,7 +285,7 @@ class OctaveCodePrinter(CodePrinter):
         return '[%s]' % A.table(self, rowstart='', rowend='',
                                 rowsep=';\n', colsep=' ')
 
-    def _print_SparseMatrix(self, A):
+    def _print_SparseMatrixBase(self, A):
         from ..matrices import Matrix
         L = A.col_list()
         # make row vectors of the indices and entries
@@ -292,19 +294,6 @@ class OctaveCodePrinter(CodePrinter):
         AIJ = Matrix([[k[2] for k in L]])
         return 'sparse(%s, %s, %s, %s, %s)' % (self._print(I), self._print(J),
                                                self._print(AIJ), A.rows, A.cols)
-
-    # FIXME: Str/CodePrinter could define each of these to call the _print
-    # method from higher up the class hierarchy (see _print_NumberSymbol).
-    # Then subclasses like us would not need to repeat all this.
-    _print_Matrix = \
-        _print_DenseMatrix = \
-        _print_MutableDenseMatrix = \
-        _print_ImmutableMatrix = \
-        _print_ImmutableDenseMatrix = \
-        _print_MatrixBase
-    _print_MutableSparseMatrix = \
-        _print_ImmutableSparseMatrix = \
-        _print_SparseMatrix
 
     def _print_MatrixElement(self, expr):
         return self._print(expr.parent) + '(%s, %s)' % (expr.i + 1, expr.j + 1)

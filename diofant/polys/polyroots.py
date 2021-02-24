@@ -4,12 +4,14 @@ import functools
 import math
 
 from ..core import (Dummy, Eq, Float, I, Integer, Rational, Symbol, comp,
-                    factor_terms, igcd, pi, symbols, sympify)
+                    factor_terms, igcd, pi, symbols)
 from ..core.mul import expand_2arg
+from ..core.sympify import sympify
 from ..domains.compositedomain import CompositeDomain
 from ..functions import Piecewise, acos, cos, exp, im, root, sqrt
 from ..ntheory import divisors, isprime, nextprime
-from ..simplify import powsimp, simplify
+from ..simplify.powsimp import powsimp
+from ..simplify.simplify import simplify
 from ..utilities import ordered
 from .polyerrors import GeneratorsNeeded, PolynomialError
 from .polyquinticconst import PolyQuintic

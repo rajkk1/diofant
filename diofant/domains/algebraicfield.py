@@ -1,10 +1,11 @@
 """Implementation of :class:`AlgebraicField` class."""
 
-import functools
-import typing
+from __future__ import annotations
 
-from ..core import I, cacheit, sympify
-from ..core.sympify import CantSympify
+import functools
+
+from ..core import I, cacheit
+from ..core.sympify import CantSympify, sympify
 from ..polys.polyerrors import CoercionFailed, DomainError, NotAlgebraic
 from .characteristiczero import CharacteristicZero
 from .field import Field
@@ -161,7 +162,7 @@ class AlgebraicField(CharacteristicZero, SimpleDomain, Field):
                 return r.as_content_primitive()
 
 
-_algebraic_numbers_cache: typing.Dict[tuple, AlgebraicField] = {}
+_algebraic_numbers_cache: dict[tuple, AlgebraicField] = {}
 
 
 class ComplexAlgebraicField(AlgebraicField):

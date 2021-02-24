@@ -2,10 +2,10 @@ import functools
 from collections import defaultdict
 
 from ..core import (Add, Basic, Dummy, E, Integer, Mul, Pow, Rational, cacheit,
-                    count_ops, expand_log, expand_mul, factor_terms, prod,
-                    sympify)
+                    count_ops, expand_log, expand_mul, factor_terms, prod)
 from ..core.mul import _keep_coeff
 from ..core.rules import Transform
+from ..core.sympify import sympify
 from ..functions import exp, exp_polar, log, polarify, root, unpolarify
 from ..logic import true
 from ..ntheory import multiplicity
@@ -321,6 +321,7 @@ def powsimp(expr, deep=False, combine='all', force=False, measure=count_ops):
                 if (last  # no more radicals in base
                         or len(common_b) == 1  # nothing left to join with
                         or all(k[1] == 1 for k in common_b)):  # no rad's in common_b
+                    common_b  # XXX "peephole" optimization, http://bugs.python.org/issue2506
                     break
                 # see what we can exponentiate base by to remove any radicals
                 # so we know what to search for

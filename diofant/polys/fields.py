@@ -1,11 +1,12 @@
 """Sparse rational function fields."""
 
+from __future__ import annotations
+
 import functools
 import operator
-import typing
 
-from ..core import Expr, Symbol, sympify
-from ..core.sympify import CantSympify
+from ..core import Expr, Symbol
+from ..core.sympify import CantSympify, sympify
 from ..domains.compositedomain import CompositeDomain
 from ..domains.domainelement import DomainElement
 from ..domains.field import Field
@@ -189,6 +190,9 @@ class FractionField(Field, CompositeDomain):
     def _from_RealField(self, a, K0):
         return self(self.domain.convert(a, K0))
 
+    def _from_ComplexField(self, a, K0):
+        return self(self.domain.convert(a, K0))
+
     def _from_PolynomialRing(self, a, K0):
         try:
             return self.field_new(a)
@@ -209,7 +213,7 @@ class FractionField(Field, CompositeDomain):
         return self.domain.is_normal(a.numerator.LC)
 
 
-_field_cache: typing.Dict[tuple, FractionField] = {}
+_field_cache: dict[tuple, FractionField] = {}
 
 
 class FracElement(DomainElement, CantSympify):

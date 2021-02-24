@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import functools
 from itertools import permutations
 
@@ -57,7 +59,7 @@ def components(f, x):
 
 
 # name -> [] of symbols
-_symbols_cache = {}
+_symbols_cache: dict[str, list[Dummy]] = {}
 
 
 # NB @cacheit is not convenient here
