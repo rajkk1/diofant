@@ -4,10 +4,10 @@ import functools
 import math
 import operator
 
+from ..config import query
 from ..ntheory import factorint, isprime, nextprime
 from ..ntheory.modular import symmetric_residue
 from ..utilities import subsets
-from .polyconfig import query
 from .polyerrors import (CoercionFailed, DomainError, EvaluationFailed,
                          ExtraneousFactors)
 from .polyutils import _sort_factors
@@ -28,6 +28,7 @@ class _Factor:
                 if r.is_zero:
                     f, k = q, k + 1
                 else:
+                    r  # XXX "peephole" optimization, http://bugs.python.org/issue2506
                     break
 
             result.append((factor, k))

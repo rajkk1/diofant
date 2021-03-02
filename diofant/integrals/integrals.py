@@ -1,7 +1,8 @@
 from ..concrete.expr_with_limits import AddWithLimits
 from ..core import (Add, Basic, Dummy, Eq, Expr, Integer, Mul, Tuple, Wild,
-                    diff, nan, oo, sympify)
+                    diff, nan, oo)
 from ..core.compatibility import is_sequence
+from ..core.sympify import sympify
 from ..functions import Piecewise, log, piecewise_fold, sign, sqrt
 from ..logic import false, true
 from ..matrices import MatrixBase
@@ -435,8 +436,6 @@ class Integral(AddWithLimits):
                     try:
                         res = meijerint_definite(function, x, a, b)
                     except NotImplementedError:
-                        from .meijerint import _debug
-                        _debug('NotImplementedError from meijerint_definite')
                         res = None
                     if res is not None:
                         f, cond = res
@@ -879,8 +878,7 @@ class Integral(AddWithLimits):
                 try:
                     h = meijerint_indefinite(g, x)
                 except NotImplementedError:
-                    from .meijerint import _debug
-                    _debug('NotImplementedError from meijerint_definite')
+                    pass
                 if h is not None:
                     parts.append(coeff * h)
                     continue

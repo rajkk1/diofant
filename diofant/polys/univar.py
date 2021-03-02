@@ -1,7 +1,7 @@
 import random
 
+from ..config import query
 from ..domains import ZZ
-from .polyconfig import query
 from .polyerrors import CoercionFailed, DomainError
 from .rings import PolyElement, PolynomialRing
 from .rootisolation import _FindRoot
@@ -350,6 +350,7 @@ class UnivarPolyElement(PolyElement):
                 f, h = result
                 F = [h] + F
             else:
+                result  # XXX "peephole" optimization, http://bugs.python.org/issue2506
                 break
 
         return [f] + F

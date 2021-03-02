@@ -25,6 +25,8 @@ There are three types of functions implemented in Diofant:
 
 """
 
+from __future__ import annotations
+
 import collections
 import inspect
 import typing
@@ -714,7 +716,7 @@ class WildFunction(Function, AtomicExpr):
 
     """
 
-    include: typing.Set[typing.Any] = set()
+    include: set[typing.Any] = set()
 
     def __init__(self, name, **assumptions):
         from ..sets.sets import FiniteSet, Set
@@ -1447,6 +1449,7 @@ class Subs(Expr):
                    for _, r in reps):
                 pre += '_'
                 continue
+            reps  # XXX "peephole" optimization, http://bugs.python.org/issue2506
             break
 
         obj = Expr.__new__(cls, expr, *sympify(tuple(zip(variables, point))))

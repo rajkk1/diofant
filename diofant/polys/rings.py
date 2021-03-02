@@ -1,25 +1,25 @@
 """Sparse polynomial rings."""
 
+from __future__ import annotations
+
 import functools
 import math
 import operator
-import typing
 
+from ..config import query
 from ..core import Expr, Integer, Symbol, cacheit, oo
 from ..core import symbols as _symbols
-from ..core import sympify
 from ..core.compatibility import is_sequence
-from ..core.sympify import CantSympify
+from ..core.sympify import CantSympify, sympify
 from ..domains.compositedomain import CompositeDomain
 from ..domains.domainelement import DomainElement
-from ..domains.ring import Ring
+from ..domains.ring import CommutativeRing
 from ..ntheory import multinomial_coefficients
 from ..ntheory.modular import symmetric_residue
 from .euclidtools import _GCD
 from .factortools import _Factor
 from .monomials import Monomial
 from .orderings import lex
-from .polyconfig import query
 from .polyerrors import (CoercionFailed, ExactQuotientFailed, GeneratorsError,
                          GeneratorsNeeded, PolynomialDivisionFailed)
 from .polyoptions import Domain as DomainOpt
@@ -71,7 +71,7 @@ def _parse_symbols(symbols):
                           'Symbols or expressions')
 
 
-class PolynomialRing(_GCD, Ring, CompositeDomain, _SQF, _Factor, _test_polys):
+class PolynomialRing(_GCD, CommutativeRing, CompositeDomain, _SQF, _Factor, _test_polys):
     """A class for representing multivariate polynomial rings."""
 
     is_PolynomialRing = True
@@ -354,6 +354,9 @@ class PolynomialRing(_GCD, Ring, CompositeDomain, _SQF, _Factor, _test_polys):
     def _from_RealField(self, a, K0):
         return self(self.domain.convert(a, K0))
 
+    def _from_ComplexField(self, a, K0):
+        return self(self.domain.convert(a, K0))
+
     def _from_ExpressionDomain(self, a, K0):
         if self.domain == K0:
             return self(a)
@@ -398,7 +401,7 @@ class PolynomialRing(_GCD, Ring, CompositeDomain, _SQF, _Factor, _test_polys):
         return a.lcm(b)
 
 
-_ring_cache: typing.Dict[tuple, PolynomialRing] = {}
+_ring_cache: dict[tuple, PolynomialRing] = {}
 
 
 class PolyElement(DomainElement, CantSympify, dict):
@@ -759,17 +762,13 @@ class PolyElement(DomainElement, CantSympify, dict):
     def __add__(self, other):
         """Add two polynomials."""
         ring = self.ring
-        domain = ring.domain
         try:
             other = ring.convert(other)
         except CoercionFailed:
             return NotImplemented
         result = self.copy()
-        get = result.get
-        zero = domain.zero
-        for k in other:
-            result[k] = get(k, zero) + other[k]
-        result._strip_zero()
+        for t in other.items():
+            result = result._iadd_term(t)
         return result
 
     def __radd__(self, other):
@@ -778,17 +777,13 @@ class PolyElement(DomainElement, CantSympify, dict):
     def __sub__(self, other):
         """Subtract polynomial other from self."""
         ring = self.ring
-        domain = ring.domain
         try:
             other = ring.convert(other)
         except CoercionFailed:
             return NotImplemented
         result = self.copy()
-        get = result.get
-        zero = domain.zero
-        for k in other:
-            result[k] = get(k, zero) - other[k]
-        result._strip_zero()
+        for k, v in other.items():
+            result = result._iadd_term((k, -v))
         return result
 
     def __rsub__(self, other):
@@ -798,19 +793,13 @@ class PolyElement(DomainElement, CantSympify, dict):
     def __mul__(self, other):
         """Multiply two polynomials."""
         ring = self.ring
-        domain = ring.domain
         try:
             other = ring.convert(other)
         except CoercionFailed:
             return NotImplemented
         result = ring.zero
-        get = result.get
-        zero = domain.zero
-        for exp1 in self:
-            for exp2 in other:
-                exp = exp1*exp2
-                result[exp] = get(exp, zero) + self[exp1]*other[exp2]
-        result._strip_zero()
+        for t in self.items():
+            result = result._iadd_poly_term(other, t)
         return result
 
     def __rmul__(self, other):
@@ -867,10 +856,10 @@ class PolyElement(DomainElement, CantSympify, dict):
 
     def _pow_multinomial(self, n):
         multinomials = multinomial_coefficients(len(self), n).items()
-        zero_monom = self.ring.zero_monom
+        ring = self.ring
+        zero_monom = ring.zero_monom
         terms = self.items()
-        zero = self.ring.domain.zero
-        poly = self.ring.zero
+        poly = ring.zero
 
         for multinomial, multinomial_coeff in multinomials:
             product_monom = zero_monom
@@ -881,13 +870,7 @@ class PolyElement(DomainElement, CantSympify, dict):
                     product_monom *= monom**exp
                     product_coeff *= coeff**exp
 
-            monom = product_monom
-            coeff = poly.get(monom, zero) + product_coeff
-
-            if coeff:
-                poly[monom] = coeff
-            elif monom in poly:
-                del poly[monom]
+            poly = poly._iadd_term((product_monom, product_coeff))
 
         return poly
 

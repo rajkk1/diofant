@@ -1,9 +1,5 @@
 """Diofant is a Python library for symbolic mathematics."""
 
-import os
-DIOFANT_DEBUG = os.getenv('DIOFANT_DEBUG', 'False') != 'False'
-del os
-
 import pkg_resources
 __version__ = pkg_resources.get_distribution(__name__).version
 del pkg_resources
@@ -57,7 +53,7 @@ from .domains import (CC, EX, FF, GF, GROUND_TYPES, QQ, RR, ZZ, AlgebraicField,
                       ExpressionDomain, FF_gmpy, FF_python, FiniteField,
                       IntegerRing, PythonRational, QQ_gmpy, QQ_python,
                       RationalField, RealAlgebraicField, RealField, ZZ_gmpy,
-                      ZZ_python, FiniteRing)
+                      ZZ_python, IntegerModRing)
 from .series import Limit, O, Order, limit, residue, series
 from .functions import (E1, Abs, Chi, Ci, DiracDelta, Ei, Eijk,
                         FallingFactorial, Heaviside, Id, KroneckerDelta,
@@ -307,4 +303,4 @@ __all__ = (
     'plot_backends', 'plot_implicit', 'plot_parametric', 'StrPrinter', 'ccode',
     'dotprint', 'fcode', 'latex', 'mathematica_code', 'mathml', 'octave_code',
     'pprint', 'pprint_use_unicode', 'pretty', 'pretty_print', 'python', 'srepr',
-    'sstr', 'sstrrepr', 'init_printing', 'ExtendedReals', 'FiniteRing')
+    'sstr', 'sstrrepr', 'init_printing', 'ExtendedReals', 'IntegerModRing')

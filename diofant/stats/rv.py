@@ -13,6 +13,8 @@ diofant.stats.rv_interface
 
 """
 
+from __future__ import annotations
+
 import typing
 
 from ..abc import x
@@ -131,8 +133,8 @@ class PSpace(Expr):
 
     """
 
-    is_Finite: typing.Union[bool, None] = None
-    is_Continuous: typing.Union[bool, None] = None
+    is_Finite: typing.Optional[bool] = None
+    is_Continuous: typing.Optional[bool] = None
 
     @property
     def values(self):
@@ -1011,7 +1013,7 @@ def rv_subs(expr):
 class NamedArgsMixin:
     """Helper class for named arguments."""
 
-    _argnames: typing.Tuple[str, ...] = ()
+    _argnames: tuple[str, ...] = ()
 
     def __getattr__(self, attr):
         try:
