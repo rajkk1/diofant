@@ -295,11 +295,19 @@ Algebraic number fields
 .. currentmodule:: diofant.polys.numberfields
 .. autofunction:: minpoly_groebner
 
+Factorization over algebraic number fields
+==========================================
+
+.. automodule:: diofant.polys.factorization_alg_field
+    :members:
+    :private-members:
+
 Modular GCD
 ===========
 
 .. automodule:: diofant.polys.modulargcd
     :members:
+    :private-members:
 
 Heuristic GCD
 =============
@@ -322,9 +330,6 @@ Many parts of the polys module are still undocumented, and even where there is
 documentation it is scarce. Please contribute!
 
 .. automodule:: diofant.polys.polyoptions
-    :members:
-
-.. automodule:: diofant.polys.polyconfig
     :members:
 
 .. automodule:: diofant.polys.polyerrors

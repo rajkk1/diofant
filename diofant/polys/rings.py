@@ -1,25 +1,25 @@
 """Sparse polynomial rings."""
 
+from __future__ import annotations
+
 import functools
 import math
 import operator
-import typing
 
+from ..config import query
 from ..core import Expr, Integer, Symbol, cacheit, oo
 from ..core import symbols as _symbols
-from ..core import sympify
 from ..core.compatibility import is_sequence
-from ..core.sympify import CantSympify
+from ..core.sympify import CantSympify, sympify
 from ..domains.compositedomain import CompositeDomain
 from ..domains.domainelement import DomainElement
-from ..domains.ring import Ring
+from ..domains.ring import CommutativeRing
 from ..ntheory import multinomial_coefficients
 from ..ntheory.modular import symmetric_residue
 from .euclidtools import _GCD
 from .factortools import _Factor
 from .monomials import Monomial
-from .orderings import ilex, lex
-from .polyconfig import query
+from .orderings import lex
 from .polyerrors import (CoercionFailed, ExactQuotientFailed, GeneratorsError,
                          GeneratorsNeeded, PolynomialDivisionFailed)
 from .polyoptions import Domain as DomainOpt
@@ -71,7 +71,7 @@ def _parse_symbols(symbols):
                           'Symbols or expressions')
 
 
-class PolynomialRing(_GCD, Ring, CompositeDomain, _SQF, _Factor, _test_polys):
+class PolynomialRing(_GCD, CommutativeRing, CompositeDomain, _SQF, _Factor, _test_polys):
     """A class for representing multivariate polynomial rings."""
 
     is_PolynomialRing = True
@@ -346,6 +346,9 @@ class PolynomialRing(_GCD, Ring, CompositeDomain, _SQF, _Factor, _test_polys):
     def _from_RealField(self, a, K0):
         return self(self.domain.convert(a, K0))
 
+    def _from_ComplexField(self, a, K0):
+        return self(self.domain.convert(a, K0))
+
     def _from_ExpressionDomain(self, a, K0):
         if self.domain == K0:
             return self(a)
@@ -390,7 +393,7 @@ class PolynomialRing(_GCD, Ring, CompositeDomain, _SQF, _Factor, _test_polys):
         return a.lcm(b)
 
 
-_ring_cache: typing.Dict[tuple, PolynomialRing] = {}
+_ring_cache: dict[tuple, PolynomialRing] = {}
 
 
 class PolyElement(DomainElement, CantSympify, dict):
@@ -433,11 +436,11 @@ class PolyElement(DomainElement, CantSympify, dict):
         Examples
         ========
 
-        >>> R, x, y = ring('x y', ZZ)
+        >>> _, x, y = ring('x y', ZZ)
         >>> p = (x + y)**2
         >>> p1 = p.copy()
         >>> p2 = p
-        >>> p[R.zero_monom] = 3
+        >>> p[(0, 0)] = 3
         >>> p
         x**2 + 2*x*y + y**2 + 3
         >>> p1
@@ -473,7 +476,7 @@ class PolyElement(DomainElement, CantSympify, dict):
                     for new_M in new_monoms:
                         new_M.append(0)
 
-            terms = zip(map(tuple, new_monoms), coeffs)
+            terms = zip(map(Monomial, new_monoms), coeffs)
 
             return new_ring.from_terms(terms)
         else:
@@ -549,16 +552,13 @@ class PolyElement(DomainElement, CantSympify, dict):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def sort_key(self):
-        return len(self), self.terms()
-
     def drop(self, gen):
         ring = self.ring
         i = ring.index(gen)
 
         if ring.is_univariate:
             if self.is_ground:
-                return self.coeff(1)
+                return self[1]
             else:
                 raise ValueError(f"can't drop {gen}")
         else:
@@ -639,8 +639,11 @@ class PolyElement(DomainElement, CantSympify, dict):
         symbols = ring.symbols
         ngens = ring.ngens
         zm = ring.zero_monom
+        order = ring.order
         sexpvs = []
-        for expv, coeff in self.terms():
+        for expv, coeff in sorted(self.items(),
+                                  key=lambda m: order(m[0]),
+                                  reverse=True):
             normal = ring.domain.is_normal(coeff)
             sign = ' + ' if normal else ' - '
             sexpvs.append(sign)
@@ -735,8 +738,9 @@ class PolyElement(DomainElement, CantSympify, dict):
         if self.is_zero:
             return True
 
-        tdeg = sum(self.LM)
-        return all(sum(monom) == tdeg for monom in self.monoms()[1:])
+        lm = self.LM
+        tdeg = sum(lm)
+        return all(sum(monom) == tdeg for monom in self.keys() if monom != lm)
 
     def __neg__(self):
         return self.__class__({monom: -self[monom] for monom in self})
@@ -750,17 +754,13 @@ class PolyElement(DomainElement, CantSympify, dict):
     def __add__(self, other):
         """Add two polynomials."""
         ring = self.ring
-        domain = ring.domain
         try:
             other = ring.convert(other)
         except CoercionFailed:
             return NotImplemented
         result = self.copy()
-        get = result.get
-        zero = domain.zero
-        for k in other:
-            result[k] = get(k, zero) + other[k]
-        result._strip_zero()
+        for t in other.items():
+            result = result._iadd_term(t)
         return result
 
     def __radd__(self, other):
@@ -769,17 +769,13 @@ class PolyElement(DomainElement, CantSympify, dict):
     def __sub__(self, other):
         """Subtract polynomial other from self."""
         ring = self.ring
-        domain = ring.domain
         try:
             other = ring.convert(other)
         except CoercionFailed:
             return NotImplemented
         result = self.copy()
-        get = result.get
-        zero = domain.zero
-        for k in other:
-            result[k] = get(k, zero) - other[k]
-        result._strip_zero()
+        for k, v in other.items():
+            result = result._iadd_term((k, -v))
         return result
 
     def __rsub__(self, other):
@@ -789,19 +785,13 @@ class PolyElement(DomainElement, CantSympify, dict):
     def __mul__(self, other):
         """Multiply two polynomials."""
         ring = self.ring
-        domain = ring.domain
         try:
             other = ring.convert(other)
         except CoercionFailed:
             return NotImplemented
         result = ring.zero
-        get = result.get
-        zero = domain.zero
-        for exp1 in self:
-            for exp2 in other:
-                exp = exp1*exp2
-                result[exp] = get(exp, zero) + self[exp1]*other[exp2]
-        result._strip_zero()
+        for t in self.items():
+            result = result._iadd_poly_term(other, t)
         return result
 
     def __rmul__(self, other):
@@ -809,24 +799,23 @@ class PolyElement(DomainElement, CantSympify, dict):
         return self.__mul__(other)
 
     def _sparsity(self):
-        from ..functions import binomial
         ring = self.ring
         d = self.total_degree()
-        return len(self)/int(binomial(ring.ngens + d, d)) if d > 0 else 1.0
+        return len(self)/int(math.factorial(ring.ngens + d)/(math.factorial(d)*math.factorial(ring.ngens))) if d > 0 else 1.0
 
     def __pow__(self, n, mod=None):
         """Raise polynomial to power `n`."""
         ring = self.ring
-        n = int(n)
 
-        if n < 0:
-            raise ValueError('negative exponent')
-        elif not n:
+        if not isinstance(n, int) or n < 0:
+            raise ValueError('exponent must be a nonnegative integer')
+
+        if not n:
             return ring.one
         elif self._sparsity() > 0.2 or mod:
             return self._pow_generic(n, mod)
         elif len(self) == 1:
-            monom, coeff = list(self.items())[0]
+            [(monom, coeff)] = self.items()
             p = ring.zero
             p[monom**n] = coeff**n
             return p
@@ -859,10 +848,10 @@ class PolyElement(DomainElement, CantSympify, dict):
 
     def _pow_multinomial(self, n):
         multinomials = multinomial_coefficients(len(self), n).items()
-        zero_monom = self.ring.zero_monom
+        ring = self.ring
+        zero_monom = ring.zero_monom
         terms = self.items()
-        zero = self.ring.domain.zero
-        poly = self.ring.zero
+        poly = ring.zero
 
         for multinomial, multinomial_coeff in multinomials:
             product_monom = zero_monom
@@ -873,13 +862,7 @@ class PolyElement(DomainElement, CantSympify, dict):
                     product_monom *= monom**exp
                     product_coeff *= coeff**exp
 
-            monom = product_monom
-            coeff = poly.get(monom, zero) + product_coeff
-
-            if coeff:
-                poly[monom] = coeff
-            elif monom in poly:
-                del poly[monom]
+            poly = poly._iadd_term((product_monom, product_coeff))
 
         return poly
 
@@ -907,6 +890,7 @@ class PolyElement(DomainElement, CantSympify, dict):
 
     def __divmod__(self, other):
         ring = self.ring
+        domain = ring.domain
 
         if not other:
             raise ZeroDivisionError('polynomial division')
@@ -914,7 +898,7 @@ class PolyElement(DomainElement, CantSympify, dict):
             (q,), r = self.div([other])
             return q, r
         elif isinstance(other, PolyElement):
-            if isinstance(ring.domain, PolynomialRing) and ring.domain.ring == other.ring:
+            if isinstance(domain, PolynomialRing) and domain.ring == other.ring:
                 pass
             else:
                 return NotImplemented
@@ -948,28 +932,45 @@ class PolyElement(DomainElement, CantSympify, dict):
             return self.quo_ground(other)
 
     def div(self, fv):
-        """Division algorithm, see :cite:`Cox2015ideals`, p. 64.
+        """Division algorithm for multivariate polynomials.
 
-        fv array of polynomials
-           return qv, r such that
-           self = sum(fv[i]*qv[i]) + r
+        Parameters
+        ==========
 
-        All polynomials are required not to be Laurent polynomials.
+        fv : sequence of PolyElement's
+            List of divsors.
+
+        Returns
+        =======
+
+        (qv, r) : tuple
+            Where qv is the sequence of quotients and r is the remainder.
+
+        Notes
+        =====
+
+        For multivariate polynomials the remainder is not uniquely
+        determined, unless divisors form a Gröbner basis.
 
         Examples
         ========
 
         >>> _, x, y = ring('x y', ZZ)
-        >>> f = x**3
-        >>> f0 = x - y**2
-        >>> f1 = x - y
-        >>> qv, r = f.div((f0, f1))
-        >>> qv[0]
-        x**2 + x*y**2 + y**4
-        >>> qv[1]
-        0
-        >>> r
-        y**6
+        >>> f = x**2*y
+        >>> f1, f2 = x**2 - y, x*y - 1
+        >>> f.div([f1, f2])
+        ([y, 0], y**2)
+        >>> f.div([f2, f1])
+        ([x, 0], x)
+
+        >>> g1, g2 = x - y**2, y**3 - 1
+        >>> f.div([g1, g2])[1] == f.div([g2, g1])[1]
+        True
+
+        References
+        ==========
+
+        * :cite:`Cox2015ideals`, p. 64.
 
         """
         ring = self.ring
@@ -1092,7 +1093,7 @@ class PolyElement(DomainElement, CantSympify, dict):
     def _get_coeff(self, expv):
         return self.get(expv, self.ring.domain.zero)
 
-    def coeff(self, element):
+    def __getitem__(self, element):
         """
         Returns the coefficient that stands next to the given monomial.
 
@@ -1107,21 +1108,23 @@ class PolyElement(DomainElement, CantSympify, dict):
         >>> _, x, y, z = ring('x y z', ZZ)
         >>> f = 3*x**2*y - x*y*z + 7*z**3 + 23
 
-        >>> f.coeff(x**2*y)
+        >>> f[x**2*y]
         3
-        >>> f.coeff(x*y)
+        >>> f[x*y]
         0
-        >>> f.coeff(1)
+        >>> f[1]
         23
 
         """
-        if element == 1:
-            return self._get_coeff(self.ring.zero_monom)
-        elif isinstance(element, self.ring.dtype) and element.is_monomial:
+        ring = self.ring
+
+        if isinstance(element, tuple):
+            return self._get_coeff(element)
+        elif element == 1:
+            return self._get_coeff(ring.zero_monom)
+        elif isinstance(element, ring.dtype) and element.is_monomial:
             monom, = element
             return self._get_coeff(monom)
-        elif is_sequence(element) and all(isinstance(n, int) for n in element):
-            return self._get_coeff(element)
 
         raise ValueError(f'expected a monomial, got {element}')
 
@@ -1180,89 +1183,13 @@ class PolyElement(DomainElement, CantSympify, dict):
             p[expv] = self[expv]
         return p
 
-    def _sorted(self, seq, order):
-        if order is None:
-            order = self.ring.order
-        else:
-            order = OrderOpt.preprocess(order)
-
-        return sorted(seq, key=lambda monom: order(monom[0]), reverse=True)
-
-    def coeffs(self, order=None):
-        """Ordered list of polynomial coefficients.
-
-        Parameters
-        ==========
-
-        order : :class:`~diofant.polys.polyoptions.Order` or coercible, optional
-
-        Examples
-        ========
-
-        >>> _, x, y = ring('x y', ZZ, lex)
-        >>> f = x*y**7 + 2*x**2*y**3
-
-        >>> f.coeffs()
-        [2, 1]
-        >>> f.coeffs(grlex)
-        [1, 2]
-
-        """
-        return [coeff for _, coeff in self.terms(order)]
-
-    def monoms(self, order=None):
-        """Ordered list of polynomial monomials.
-
-        Parameters
-        ==========
-
-        order : :class:`~diofant.polys.polyoptions.Order` or coercible, optional
-
-        Examples
-        ========
-
-        >>> _, x, y = ring('x y', ZZ, lex)
-        >>> f = x*y**7 + 2*x**2*y**3
-
-        >>> f.monoms()
-        [(2, 3), (1, 7)]
-        >>> f.monoms(grlex)
-        [(1, 7), (2, 3)]
-
-        """
-        return [monom for monom, _ in self.terms(order)]
-
-    def terms(self, order=None):
-        """Ordered list of polynomial terms.
-
-        Parameters
-        ==========
-
-        order : :class:`~diofant.polys.polyoptions.Order` or coercible, optional
-
-        Examples
-        ========
-
-        >>> _, x, y = ring('x y', ZZ, lex)
-        >>> f = x*y**7 + 2*x**2*y**3
-
-        >>> f.terms()
-        [((2, 3), 2), ((1, 7), 1)]
-        >>> f.terms(grlex)
-        [((1, 7), 1), ((2, 3), 2)]
-
-        """
-        return self._sorted(self.items(), order)
-
     def content(self):
         """Returns GCD of polynomial's coefficients."""
         ring = self.ring
         domain = ring.domain
-        cont = domain.zero
         gcd = domain.gcd
 
-        for coeff in self.values():
-            cont = gcd(cont, coeff)
+        cont = functools.reduce(gcd, self.values(), domain.zero)
 
         if not ring.is_normal(self):
             cont = -cont
@@ -1290,20 +1217,19 @@ class PolyElement(DomainElement, CantSympify, dict):
 
         return self.__class__({monom: self[monom]*x for monom in self})
 
-    def mul_monom(self, monom):
-        terms = {f_monom*monom: self[f_monom] for f_monom in self}
-        return self.__class__(terms)
+    def mul_monom(self, m):
+        return self.__class__({monom*m: self[monom] for monom in self})
 
     def mul_term(self, term):
-        monom, coeff = term
+        ring = self.ring
+        m, c = term
 
-        if not self or not coeff:
-            return self.ring.zero
-        elif monom == self.ring.zero_monom:
-            return self.mul_ground(coeff)
+        if not self or not c:
+            return ring.zero
+        elif m == ring.zero_monom:
+            return self.mul_ground(c)
 
-        terms = {f_monom*monom: self[f_monom]*coeff for f_monom in self}
-        return self.__class__(terms)
+        return self.__class__({monom*m: self[monom]*c for monom in self})
 
     def quo_ground(self, x):
         domain = self.ring.domain
@@ -1315,11 +1241,10 @@ class PolyElement(DomainElement, CantSympify, dict):
 
         if domain.is_Field:
             quo = domain.quo
-            terms = {monom: quo(self[monom], x) for monom in self}
+            p = self.__class__({monom: quo(self[monom], x) for monom in self})
         else:
-            terms = {monom: self[monom]//x for monom in self}
+            p = self.__class__({monom: self[monom]//x for monom in self})
 
-        p = self.__class__(terms)
         p._strip_zero()
         return p
 
@@ -1331,9 +1256,7 @@ class PolyElement(DomainElement, CantSympify, dict):
         if not self or x == domain.one:
             return self
 
-        terms = {monom: domain.exquo(self[monom], x) for monom in self}
-
-        p = self.__class__(terms)
+        p = self.__class__({monom: domain.exquo(self[monom], x) for monom in self})
         p._strip_zero()
         return p
 
@@ -1364,7 +1287,7 @@ class PolyElement(DomainElement, CantSympify, dict):
             terms = {}
 
             for monom, coeff in self.items():
-                coeff = coeff % p
+                coeff %= p
                 terms[monom] = symmetric_residue(coeff, p)
         else:
             terms = {monom: self[monom] % p for monom in self}
@@ -1397,69 +1320,6 @@ class PolyElement(DomainElement, CantSympify, dict):
     def l1_norm(self):
         return self._norm(sum)
 
-    def deflate(self, *G):
-        """Map ``x_i**m_i`` to ``y_i`` in a set of polynomials in ``K[X]``.
-
-        Examples
-        ========
-
-        >>> _, x, y = ring('x y', ZZ)
-        >>> (x**2*y**3 + 2*x**2 + 3*y**3 + 4).deflate(x**2*y**2 + 2*x**2 +
-        ...                                           3*y**2 + 4)
-        ((2, 1), [x*y**3 + 2*x + 3*y**3 + 4, x*y**2 + 2*x + 3*y**2 + 4])
-
-        """
-        ring = self.ring
-        polys = [self] + list(G)
-
-        J = [0]*ring.ngens
-
-        for p in polys:
-            for monom in p:
-                for i, m in enumerate(monom):
-                    J[i] = math.gcd(J[i], m)
-
-        for i, b in enumerate(J):
-            if not b:
-                J[i] = 1
-
-        J = tuple(J)
-
-        if all(b == 1 for b in J):
-            return J, polys
-
-        H = []
-
-        for p in polys:
-            h = ring.zero
-
-            for I, coeff in p.items():
-                N = [i//j for i, j in zip(I, J)]
-                h[N] = coeff
-
-            H.append(h)
-
-        return J, H
-
-    def inflate(self, J):
-        """Map ``y_i`` to ``x_i**J_i`` in a polynomial in ``K[X]``.
-
-        Examples
-        ========
-
-        >>> _, x, y = ring('x y', ZZ)
-        >>> (x*y + 2*x + 3*y + 4).inflate((2, 3))
-        x**2*y**3 + 2*x**2 + 3*y**3 + 4
-
-        """
-        poly = self.ring.zero
-
-        for I, coeff in self.items():
-            N = [i*j for i, j in zip(I, J)]
-            poly[N] = coeff
-
-        return poly
-
     def lcm(self, g):
         f = self
         domain = f.ring.domain
@@ -1483,15 +1343,17 @@ class PolyElement(DomainElement, CantSympify, dict):
         return self.ring.cofactors(self, other)
 
     def terms_gcd(self):
+        ring = self.ring
+
         if self.is_zero:
-            return (0,)*self.ring.ngens, self
+            return (0,)*ring.ngens, self
 
         G = functools.reduce(Monomial.gcd, self)
 
         if all(g == 0 for g in G):
             return G, self
 
-        f = self.ring.zero
+        f = ring.zero
 
         for monom, coeff in self.items():
             f[monom/G] = coeff
@@ -1505,7 +1367,7 @@ class PolyElement(DomainElement, CantSympify, dict):
         Examples
         ========
 
-        >>> R, x, y = ring('x y', ZZ)
+        >>> _, x, y = ring('x y', ZZ)
 
         >>> (2*x**2 - 2).cancel(x**2 - 2*x + 1)
         (2*x + 2, x - 1)
@@ -1629,7 +1491,7 @@ class PolyElement(DomainElement, CantSympify, dict):
         if ring.is_univariate:
             [(i, g)] = replacements
             acc, d = ring.one, 0
-            for monom, coeff in self.terms(ilex):
+            for monom, coeff in sorted(self.items(), key=lambda x: x[0]):
                 n = monom[i]
                 acc *= g**(n - d)
                 d = n
@@ -1688,7 +1550,7 @@ class PolyElement(DomainElement, CantSympify, dict):
         Examples
         ========
 
-        >>> R, x, y = ring('x y', ZZ)
+        >>> _, x, y = ring('x y', ZZ)
 
         >>> (x**2 + x*y).prem(2*x + 2)
         -4*y + 4
@@ -1710,8 +1572,6 @@ class PolyElement(DomainElement, CantSympify, dict):
             f, g = map(operator.methodcaller('eject', *ring.gens[1:]), (f, g))
             r = f.prem(g)
             return r.inject()
-
-        ring = f.ring
 
         df = f.degree()
         dg = g.degree()
@@ -1751,7 +1611,7 @@ class PolyElement(DomainElement, CantSympify, dict):
         Examples
         ========
 
-        >>> R, x, y = ring('x y', ZZ)
+        >>> _, x, y = ring('x y', ZZ)
 
         >>> f = 3*x**2*y - y**3 - 4
         >>> g = x**2 + x*y**3 - 9
@@ -1778,7 +1638,7 @@ class PolyElement(DomainElement, CantSympify, dict):
         Examples
         ========
 
-        >>> R, x, y = ring('x y', ZZ)
+        >>> _, x, y = ring('x y', ZZ)
 
         >>> f = 3*x**2*y - y**3 - 4
         >>> g = x**2 + x*y**3 - 9
@@ -1802,7 +1662,7 @@ class PolyElement(DomainElement, CantSympify, dict):
         Examples
         ========
 
-        >>> R, x = ring('x', QQ)
+        >>> _, x = ring('x', QQ)
 
         >>> f = x**4 - 2*x**3 - 6*x**2 + 12*x + 15
         >>> g = x**3 + x**2 - 4*x - 4

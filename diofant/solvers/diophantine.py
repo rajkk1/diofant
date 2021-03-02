@@ -11,7 +11,7 @@ from ..functions import floor, sign, sqrt
 from ..matrices import Matrix
 from ..ntheory import (divisors, factorint, is_square, isprime, multiplicity,
                        nextprime, perfect_power, sqrt_mod, square_factor)
-from ..polys import GeneratorsNeeded, Poly, factor_list
+from ..polys import GeneratorsNeeded, factor_list
 from ..simplify import signsimp
 from ..utilities import default_sort_key, filldedent, numbered_symbols
 from .solvers import solve
@@ -147,7 +147,7 @@ def diophantine(eq, param=symbols('t', integer=True), syms=None):
         eq = factor_terms(eq)
         assert not eq.is_number
         eq = eq.as_independent(*var, as_Add=False)[1]
-        p = Poly(eq)
+        p = eq.as_poly()
         assert not any(g.is_number for g in p.gens)
         eq = p.as_expr()
         assert eq.is_polynomial()
@@ -319,26 +319,6 @@ def diop_solve(eq, param=symbols('t', integer=True)):
 
 
 def classify_diop(eq, _dict=True):
-    """
-    Helper routine used by diop_solve() to find the type of the ``eq`` etc.
-
-    Parameters
-    ==========
-
-    eq : Expr
-        an expression, which is assumed to be zero.
-
-    Examples
-    ========
-
-    >>> classify_diop(4*x + 6*y - 4)
-    ([x, y], {1: -4, x: 4, y: 6}, 'linear')
-    >>> classify_diop(x + 3*y - 4*z + 5)
-    ([x, y, z], {1: 5, x: 1, y: 3, z: -4}, 'linear')
-    >>> classify_diop(x**2 + y**2 - x*y + x + 5)
-    ([x, y], {1: 5, x: 1, x**2: 1, y**2: 1, x*y: -1}, 'binary_quadratic')
-
-    """
     try:
         var = list(eq.free_symbols)
         assert var
@@ -351,7 +331,7 @@ def classify_diop(eq, _dict=True):
         raise TypeError('Coefficients should be Integers')
 
     diop_type = None
-    total_degree = Poly(eq).total_degree()
+    total_degree = eq.as_poly().total_degree()
     homogeneous = 1 not in coeff
     if total_degree == 1:
         diop_type = 'linear'
@@ -416,7 +396,25 @@ def classify_diop(eq, _dict=True):
         diop_classify()."""))
 
 
-classify_diop.__doc__ += """
+classify_diop.__doc__ = """
+    Helper routine used by diop_solve() to find the type of the ``eq`` etc.
+
+    Parameters
+    ==========
+
+    eq : Expr
+        an expression, which is assumed to be zero.
+
+    Examples
+    ========
+
+    >>> classify_diop(4*x + 6*y - 4)
+    ([x, y], {1: -4, x: 4, y: 6}, 'linear')
+    >>> classify_diop(x + 3*y - 4*z + 5)
+    ([x, y, z], {1: 5, x: 1, y: 3, z: -4}, 'linear')
+    >>> classify_diop(x**2 + y**2 - x*y + x + 5)
+    ([x, y], {1: 5, x: 1, x**2: 1, y**2: 1, x*y: -1}, 'binary_quadratic')
+
     Returns
     =======
 

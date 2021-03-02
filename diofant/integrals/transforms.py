@@ -4,7 +4,8 @@ import functools
 from itertools import repeat
 
 from ..core import (Add, Dummy, E, Function, I, Integer, Mul, Rational, expand,
-                    expand_mul, oo, pi, sympify)
+                    expand_mul, oo, pi)
+from ..core.sympify import sympify
 from ..functions import cos, sin, sqrt
 from ..logic import And, Or, false, to_cnf, true
 from ..logic.boolalg import conjuncts, disjuncts
@@ -481,8 +482,8 @@ def _rewrite_gamma(f, s, a, b):
         if a_.free_symbols or b_.free_symbols or c.free_symbols:
             return  # XXX
             # raise IntegralTransformError('Inverse Mellin', f,
-            #                     'Could not determine position of singularity %s'
-            #                     ' relative to fundamental strip' % c)
+            #                     f'Could not determine position of singularity {c!s}'
+            #                     ' relative to fundamental strip')
         raise MellinTransformStripError('Pole inside critical strip?')
 
     # 1)
@@ -564,7 +565,7 @@ def _rewrite_gamma(f, s, a, b):
             p = Poly(arg, s)
             if p.degree() != 1:
                 raise exception(fact)
-            return p.all_coeffs()
+            return list(reversed(p.all_coeffs()))
 
         # constants
         if not fact.has(s):
@@ -605,7 +606,7 @@ def _rewrite_gamma(f, s, a, b):
                 ufacs += [coeff]
                 args += [(s - c, is_numer) for c in rs]
                 continue
-            a, c = p.all_coeffs()
+            c, a = p.all_coeffs()
             ufacs += [a]
             c /= -a
             # Now need to convert s - c

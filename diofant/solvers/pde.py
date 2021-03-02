@@ -42,8 +42,9 @@ from ..core import (Add, Eq, Equality, Function, Subs, Symbol, Wild, expand,
 from ..core.compatibility import is_sequence
 from ..functions import exp
 from ..integrals import Integral
-from ..polys import lcm_list
-from ..simplify import collect, simplify
+from ..polys import lcm
+from ..simplify.radsimp import collect
+from ..simplify.simplify import simplify
 from ..utilities import filldedent, has_dups
 from .deutils import _desolve, _preprocess, ode_order
 from .solvers import solve
@@ -518,7 +519,8 @@ def pde_1st_linear_constant_coeff(eq, func, order, match, solvefun):
                   d               d
         a*f(x, y) + b*--(f(x, y)) + c*--(f(x, y)) - G(x, y)
                   dx              dy
-        >>> pprint(pdsolve(genform, hint='1st_linear_constant_coeff_Integral'), use_unicode=False)
+        >>> pprint(pdsolve(genform, hint='1st_linear_constant_coeff_Integral'),
+        ...        use_unicode=False)
                   /         /          b*x + c*y
                   |         |              /
                   |         |             |
@@ -878,7 +880,7 @@ def _separate(eq, dep, others):
         if sep.has(*others):
             return
         div.add(ext)
-    div = lcm_list(div)
+    div = functools.reduce(lcm, div)
     eq = Add(*[simplify(t/div) for t in eq.args])
 
     # SECOND PASS - separate the derivatives

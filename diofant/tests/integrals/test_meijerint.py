@@ -144,6 +144,10 @@ def test_meijerint():
 
     assert meijerint_indefinite(exp(x), x) == exp(x)
 
+    # issue sympy/sympy#8368
+    assert meijerint_indefinite(cosh(x)*exp(-x*t), x) == (
+        (-t - 1)*exp(x) + (-t + 1)*exp(-x))*exp(-t*x)/2/(t**2 - 1)
+
     # TODO what simplifications should be done automatically?
     # This tests "extra case" for antecedents_1.
     a, b = symbols('a b', positive=True)
@@ -227,6 +231,10 @@ def test_meijerint():
     a, s = symbols('a s', positive=True)
     assert simplify(integrate(x**s*exp(-a*x**2), (x, -oo, oo))) == \
         a**(-s/2 - Rational(1, 2))*((-1)**s + 1)*gamma(s/2 + Rational(1, 2))/2
+
+    # issue sympy/sympy#6348
+    assert integrate(exp(I*x)/(1 + x**2),
+                     (x, -oo, oo)).simplify().rewrite(exp) == pi*exp(-1)
 
 
 def test_bessel():
@@ -628,11 +636,6 @@ def test_sympyissue_6252():
     assert not anti.has(hyper)
 
 
-def test_sympyissue_6348():
-    assert integrate(exp(I*x)/(1 + x**2), (x, -oo, oo)).simplify().rewrite(exp) \
-        == pi*exp(-1)
-
-
 def test_fresnel():
     assert expand_func(integrate(sin(pi*x**2/2), x)) == fresnels(x)
     assert expand_func(integrate(cos(pi*x**2/2), x)) == fresnelc(x)
@@ -640,11 +643,6 @@ def test_fresnel():
 
 def test_sympyissue_6860():
     assert meijerint_indefinite(x**x**x, x) is None
-
-
-def test_sympyissue_8368():
-    assert meijerint_indefinite(cosh(x)*exp(-x*t), x) == (
-        (-t - 1)*exp(x) + (-t + 1)*exp(-x))*exp(-t*x)/2/(t**2 - 1)
 
 
 def test_meijerint_indefinite_abs():
@@ -665,7 +663,7 @@ def test_sympyissue_10681():
     f = integrate(r**2*(R**2 - r**2)**0.5, r, meijerg=True)
     g = (1.0/3)*R**1.0*r**3*hyper((-0.5, Rational(3, 2)), (Rational(5, 2),),
                                   r**2*exp_polar(2*I*pi)/R**2)
-    assert RR.almosteq((f/g).n(), 1.0, 1e-12)
+    assert RR.almosteq((f/g).evalf(), 1.0, 1e-12)
 
 
 def test_sympyissue_10211():
