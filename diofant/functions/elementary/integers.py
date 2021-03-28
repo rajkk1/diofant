@@ -1,3 +1,5 @@
+from mpmath.libmp.libmpf import prec_to_dps
+
 from ...core import (Add, Dummy, Function, Ge, Gt, I, Integer, Le, Lt,
                      PrecisionExhausted, Symbol)
 from ...logic import false, true
@@ -15,7 +17,7 @@ class RoundFunction(Function):
     def eval(cls, arg):
         from .complexes import im
         if arg.is_integer:
-            return arg
+            return Integer(arg) if arg.is_number else arg
         if isinstance(arg, cls):
             return arg
         if arg.is_imaginary or (I*arg).is_extended_real:
@@ -54,8 +56,11 @@ class RoundFunction(Function):
                 from ...core.evalf import DEFAULT_MAXPREC as TARGET
                 prec = 10
                 while True:
-                    r, i = cls(npart, evaluate=False).evalf(prec).as_real_imag()
-                    if 2**prec > max(abs(int(r)), abs(int(i))) + 10:
+                    dps = prec_to_dps(prec)
+                    r, i = npart.evalf(dps).as_real_imag()
+                    if (((not r) or int(2**prec*abs(r)) > 2**prec*abs(int(r))) and
+                            ((not i) or int(2**prec*abs(i)) > 2**prec*abs(int(i)))):
+                        r, i = map(cls, (r, i))
                         break
                     else:
                         if prec >= TARGET:
