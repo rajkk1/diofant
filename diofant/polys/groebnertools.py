@@ -254,13 +254,15 @@ def spoly(p1, p2):
     This is the S-poly, provided p1 and p2 are monic
 
     """
+    ring = p1.ring
+    domain_one = ring.domain.one
     LM1 = p1.LM
     LM2 = p2.LM
     LCM12 = LM1.lcm(LM2)
-    m1 = LCM12/LM1
-    m2 = LCM12/LM2
-    s1 = p1.mul_monom(m1)
-    s2 = p2.mul_monom(m2)
+    m1 = ring.from_terms([(LCM12/LM1, domain_one)])
+    m2 = ring.from_terms([(LCM12/LM2, domain_one)])
+    s1 = p1*m1
+    s2 = p2*m2
     s = s1 - s2
     return s
 
@@ -362,7 +364,8 @@ def lbp_mul_term(f, cx):
     defined as (m * s, m * p, k).
 
     """
-    return lbp(sig_mult(Sign(f), cx[0]), Polyn(f).mul_term(cx), Num(f))
+    return lbp(sig_mult(Sign(f), cx[0]),
+               Polyn(f)*Polyn(f).ring.from_terms([cx]), Num(f))
 
 
 def lbp_cmp(f, g):
