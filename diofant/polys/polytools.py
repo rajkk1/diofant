@@ -1,11 +1,12 @@
 """User-friendly public interface to polynomial functions."""
 
 import functools
+import math
 import operator
 
 import mpmath
 
-from ..core import (Add, Basic, Derivative, E, Expr, Integer, Mul, Tuple, oo,
+from ..core import (Add, Basic, E, Expr, Integer, Mul, Tuple, oo,
                     preorder_traversal)
 from ..core.compatibility import iterable
 from ..core.decorators import _sympifyit
@@ -33,7 +34,7 @@ from .rings import PolyElement
 
 
 __all__ = ('Poly', 'PurePoly', 'parallel_poly_from_expr',
-           'degree', 'LC', 'LM', 'LT', 'prem',
+           'degree', 'LC', 'LM', 'LT',
            'div', 'rem', 'quo', 'exquo', 'half_gcdex', 'gcdex',
            'invert', 'subresultants', 'resultant', 'discriminant', 'cofactors',
            'gcd', 'lcm', 'terms_gcd', 'trunc',
@@ -844,22 +845,6 @@ class Poly(Expr):
         result = self.rep.exquo_ground(coeff)
         return self.per(result)
 
-    def prem(self, other):
-        """
-        Polynomial pseudo-remainder of ``self`` by ``other``.
-
-        Examples
-        ========
-
-        >>> (x**2 + 1).as_poly().prem((2*x - 4).as_poly())
-        Poly(20, x, domain='ZZ')
-
-        """
-        _, per, F, G = self._unify(other)
-
-        result = F.prem(G)
-        return per(result)
-
     def div(self, other, auto=True):
         """
         Polynomial division with remainder of ``self`` by ``other``.
@@ -1002,7 +987,7 @@ class Poly(Expr):
         """
         Returns degree of ``self`` in ``x_j``.
 
-        The degree of 0 is negative infinity.
+        The degree of 0 is negative floating-point infinity.
 
         Examples
         ========
@@ -1012,7 +997,7 @@ class Poly(Expr):
         >>> (x**2 + y*x + y).as_poly().degree(y)
         1
         >>> Integer(0).as_poly(x).degree()
-        -oo
+        -inf
 
         """
         j = self._gen_to_level(gen)
@@ -1287,39 +1272,11 @@ class Poly(Expr):
 
         return f.per(rep)
 
-    def diff(self, *specs, **kwargs):
-        """
-        Computes partial derivative of ``self``.
-
-        Examples
-        ========
-
-        >>> (x**2 + 2*x + 1).as_poly().diff()
-        Poly(2*x + 2, x, domain='ZZ')
-
-        >>> (x*y**2 + x).as_poly().diff((0, 0), (1, 1))
-        Poly(2*x*y, x, y, domain='ZZ')
-
-        """
-        if not kwargs.get('evaluate', True):
-            return Derivative(self, *specs, **kwargs)
-
-        if not specs:
-            return self.per(self.rep.diff())
-
+    def _eval_derivative(self, v):
         rep = self.rep
-
-        for spec in specs:
-            if type(spec) is tuple:
-                gen, m = spec
-            else:
-                gen, m = spec, 1
-
-            rep = rep.diff(self._gen_to_level(gen), int(m))
-
+        v = self._gen_to_level(v)
+        rep = rep.diff(v)
         return self.per(rep)
-
-    _eval_derivative = diff
 
     def eval(self, x, a=None, auto=True):
         """
@@ -1961,8 +1918,7 @@ class Poly(Expr):
             coeffs = [int(coeff) for coeff in self.all_coeffs()]
         elif self.domain is QQ:
             denoms = [coeff.denominator for coeff in self.all_coeffs()]
-            from ..core import ilcm
-            fac = ilcm(*denoms)
+            fac = math.lcm(*denoms)
             coeffs = [int(coeff*fac) for coeff in self.all_coeffs()]
         else:
             coeffs = [coeff.evalf(n, strict=False).as_real_imag()
@@ -2039,7 +1995,7 @@ class Poly(Expr):
         False
 
         """
-        return self.rep.is_zero
+        return not self.rep
 
     @property
     def is_one(self):
@@ -2055,7 +2011,7 @@ class Poly(Expr):
         True
 
         """
-        return self.rep.is_one
+        return self.rep == 1
 
     @property
     def is_squarefree(self):
@@ -2580,7 +2536,7 @@ def degree(f, *gens, **args):
     >>> degree(x**2 + y*x + 1, gen=y)
     1
     >>> degree(0, x)
-    -oo
+    -inf
 
     """
     allowed_flags(args, ['gen', 'polys'])
@@ -2656,32 +2612,6 @@ def LT(f, *gens, **args):
 
     monom, coeff = F.LT(order=opt.order)
     return coeff*monom.as_expr()
-
-
-def prem(f, g, *gens, **args):
-    """
-    Compute polynomial pseudo-remainder of ``f`` and ``g``.
-
-    Examples
-    ========
-
-    >>> prem(x**2 + 1, 2*x - 4)
-    20
-
-    """
-    allowed_flags(args, ['polys'])
-
-    try:
-        (F, G), opt = parallel_poly_from_expr((f, g), *gens, **args)
-    except PolificationFailed as exc:
-        raise ComputationFailed('prem', 2, exc)
-
-    r = F.prem(G)
-
-    if not opt.polys:
-        return r.as_expr()
-    else:
-        return r
 
 
 def div(f, g, *gens, **args):

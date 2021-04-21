@@ -39,7 +39,7 @@ class CommutativeRing(Domain):
         """Returns inversion of ``a mod b``."""
         s, h = self.half_gcdex(a, b)
 
-        if h == self.one:
+        if h == 1:
             return s % b
         else:
             raise NotInvertible('zero divisor')
@@ -51,10 +51,15 @@ class CommutativeRing(Domain):
 
     def cofactors(self, a, b):
         """Returns GCD and cofactors of ``a`` and ``b``."""
-        gcd = self.gcd(a, b)
-        cfa = self.quo(a, gcd)
-        cfb = self.quo(b, gcd)
+        gcd, cfa, cfb = self.gcd(a, b), self.zero, self.zero
+        if gcd:
+            cfa = self.quo(a, gcd)
+            cfb = self.quo(b, gcd)
         return gcd, cfa, cfb
+
+    def lcm(self, a, b):
+        """Returns LCM of ``a`` and ``b``."""
+        return abs(a*b)//self.gcd(a, b)
 
     @property
     @abc.abstractmethod
