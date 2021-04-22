@@ -183,9 +183,7 @@ class UnivarPolynomialRingFF(UnivarPolynomialRing):
         a, b = f, g
         while b:
             a, b = b, a % b
-        h = a.monic()
-
-        return h, f // h, g // h
+        return a.monic()
 
 
 class UnivarPolyElement(PolyElement):
