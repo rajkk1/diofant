@@ -12,11 +12,11 @@ from .field import Field
 from .groundtypes import DiofantInteger
 from .integerring import GMPYIntegerRing, PythonIntegerRing, ZZ_python
 from .quotientring import QuotientRingElement
-from .ring import Ring
+from .ring import CommutativeRing
 from .simpledomain import SimpleDomain
 
 
-class FiniteRing(Ring, SimpleDomain):
+class IntegerModRing(CommutativeRing, SimpleDomain):
     """General class for quotient rings over integers."""
 
     is_Numerical = True
@@ -35,7 +35,7 @@ class FiniteRing(Ring, SimpleDomain):
         obj.mod = mod
         obj.order = order
 
-        obj.rep = f'FiniteRing({obj.order})'
+        obj.rep = f'IntegerModRing({obj.order})'
 
         try:
             obj.dtype = _modular_integer_cache[key]
@@ -76,6 +76,7 @@ class FiniteRing(Ring, SimpleDomain):
 
     def _from_PythonFiniteField(self, a, K0=None):
         return self.dtype(self.domain.convert(a.rep, K0.domain))
+    _from_GMPYFiniteField = _from_PythonFiniteField
 
     def _from_PythonIntegerRing(self, a, K0=None):
         return self.dtype(self.domain.convert(a, K0) % self.characteristic)
@@ -84,13 +85,7 @@ class FiniteRing(Ring, SimpleDomain):
     def _from_PythonRationalField(self, a, K0=None):
         if a.denominator == 1:
             return self.convert(a.numerator)
-
-    def _from_GMPYFiniteField(self, a, K0=None):
-        return self.dtype(self.domain.convert(a.rep, K0.domain))
-
-    def _from_GMPYRationalField(self, a, K0=None):
-        if a.denominator == 1:
-            return self.convert(a.numerator)
+    _from_GMPYRationalField = _from_PythonRationalField
 
     def _from_RealField(self, a, K0):
         p, q = K0.to_rational(a)
@@ -102,7 +97,7 @@ class FiniteRing(Ring, SimpleDomain):
         return True
 
 
-class FiniteField(Field, FiniteRing):
+class FiniteField(Field, IntegerModRing):
     """General class for finite fields."""
 
     is_FiniteField = True
@@ -138,7 +133,7 @@ class FiniteField(Field, FiniteRing):
 
         key = cls, order, dom, mod, modulus
 
-        obj = super(FiniteRing, cls).__new__(cls)  # pylint: disable=bad-super-call
+        obj = super(IntegerModRing, cls).__new__(cls)  # pylint: disable=bad-super-call
 
         obj.domain = dom
         obj.mod = mod
@@ -174,17 +169,17 @@ class FiniteField(Field, FiniteRing):
         return self.mod
 
 
-_modular_integer_cache: dict[tuple, FiniteRing] = {}
+_modular_integer_cache: dict[tuple, IntegerModRing] = {}
 
 
-class PythonFiniteRing(FiniteRing):
+class PythonIntegerModRing(IntegerModRing):
     """Quotient ring based on Python's integers."""
 
     def __new__(cls, order):
         return super().__new__(cls, order, PythonIntegerRing())
 
 
-class GMPYFiniteRing(FiniteRing):
+class GMPYIntegerModRing(IntegerModRing):
     """Quotient ring based on GMPY's integers."""
 
     def __new__(cls, order):

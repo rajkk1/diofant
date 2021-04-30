@@ -6,6 +6,7 @@ See also http://math.unm.edu/~wester/cas_review.html for detailed output of
 each tested system.
 """
 import itertools
+import math
 
 import pytest
 
@@ -26,15 +27,14 @@ from diofant import (cos, cosh, cot, diff, dsolve, elliptic_e, elliptic_f, erf,
                      exp, expand, expand_func, eye, factor, factorial,
                      factorial2, factorint, fibonacci, floor,
                      fourier_transform, gamma, gcd, groebner, hessian, hyper,
-                     hyperexpand, igcd, im, integrate,
-                     inverse_laplace_transform, laplace_transform,
-                     legendre_poly, limit, log, logcombine, maximize,
-                     mellin_transform, minimize, nan, npartitions, oo, pi,
-                     polygamma, polylog, powdenest, powsimp, primerange,
-                     primitive, primitive_root, product, radsimp, re,
-                     reduce_inequalities, residue, resultant, rf, root, rsolve,
-                     sec, series, sign, simplify, sin, sinh, solve, sqrt,
-                     sqrtdenest, summation, symbols, tan, tanh, totient,
+                     hyperexpand, im, integrate, inverse_laplace_transform,
+                     laplace_transform, legendre_poly, limit, log, logcombine,
+                     maximize, mellin_transform, minimize, nan, npartitions,
+                     oo, pi, polygamma, polylog, powdenest, powsimp,
+                     primerange, primitive, primitive_root, product, radsimp,
+                     re, reduce_inequalities, residue, resultant, rf, root,
+                     rsolve, sec, series, sign, simplify, sin, sinh, solve,
+                     sqrt, sqrtdenest, summation, symbols, tan, tanh, totient,
                      trigsimp, trunc, wronskian, zeta, zoo)
 from diofant.abc import a, b, c, s, t, w, x, y, z
 from diofant.functions.combinatorial.numbers import stirling
@@ -100,7 +100,7 @@ def test_C8():
 
 
 def test_C9():
-    assert igcd(1776, 1554, 5698) == 74
+    assert math.gcd(1776, 1554, 5698) == 74
 
 
 def test_C10():
@@ -1080,8 +1080,8 @@ def test_P5_workaround():
 def test_P6():
     M = Matrix([[cos(x), sin(x)],
                 [-sin(x), cos(x)]])
-    assert M.diff(x, 2) == Matrix([[-cos(x), -sin(x)],
-                                   [sin(x), -cos(x)]])
+    assert M.diff((x, 2)) == Matrix([[-cos(x), -sin(x)],
+                                     [sin(x), -cos(x)]])
 
 
 def test_P7():
@@ -1429,7 +1429,7 @@ def test_P44():
 
 def test_P45():
     def __my_wronskian(Y, v):
-        M = Matrix([Matrix(Y).T.diff(x, n) for n in range(len(Y))])
+        M = Matrix([Matrix(Y).T.diff((x, n)) for n in range(len(Y))])
         return M.det()
     assert __my_wronskian([cos(x), sin(x)], x).simplify() == 1
 
@@ -2169,7 +2169,7 @@ def test_Z4():
 
 
 def test_Z5():
-    eq = Derivative(f(x), x, 2) + 4*f(x) - sin(2*x)
+    eq = Derivative(f(x), (x, 2)) + 4*f(x) - sin(2*x)
     sol = dsolve(eq, f(x), init={f(0): 0, f(x).diff(x).subs({x: 0}): 0})
     assert solve(sol, f(x))[0][f(x)] == -x*cos(2*x)/4 + sin(2*x)/8
 

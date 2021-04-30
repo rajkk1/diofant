@@ -976,7 +976,7 @@ class ComplexInterval:
                 dom = i.domain.algebraic_field(I)
                 f1 = i.f1.eval(a=l).set_domain(dom)
                 f2 = i.f2.eval(a=l).set_domain(dom)
-                f = f1 + f2.mul_ground(dom.unit)
+                f = f1 + f2*dom.unit
                 x = f.ring.gens[0]
                 f = f.compose(0, -dom.unit*x)
                 if i.conj:
@@ -1707,7 +1707,7 @@ class _FindRoot:
 
         f1 = f2 = new_ring.drop(0).zero
 
-        if f.is_zero:
+        if not f:
             return f1, f2
 
         t, h = new_ring.one, new_ring.zero
@@ -1745,7 +1745,7 @@ class _FindRoot:
         x**4 - 2*x**3 + 5*x**2 - 4*x + 4
 
         """
-        if f.is_zero:
+        if not f:
             return self.zero
 
         n = f.degree()
@@ -1756,7 +1756,7 @@ class _FindRoot:
 
         for c, q in zip(reversed(f.all_coeffs()[:-1]), Q[1:]):
             h *= p
-            q = q.mul_ground(c)
+            q *= c
             h += q
 
         return h

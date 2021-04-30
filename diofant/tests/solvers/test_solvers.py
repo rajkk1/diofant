@@ -1252,7 +1252,7 @@ def test_lambert_multivariate():
         -Rational(3, 2) - LambertW(-4*log(2))/(2*log(2))]
 
     # issue sympy/sympy#4271
-    assert (solve((a/x + exp(x/2)).diff(x, 2), x) ==
+    assert (solve((a/x + exp(x/2)).diff((x, 2)), x) ==
             [{x: 6*LambertW(root(-1, 3)*root(a, 3)/3)}])
 
     assert (solve((log(x) + x).subs({x: x**2 + 1})) ==
@@ -1677,3 +1677,7 @@ def test_unrad2():
 
 def test_sympyissue_20610():
     assert solve([x + y, sqrt(2)], [x, y]) == []
+
+
+def test_sympyissue_21167():
+    assert solve(cbrt(x - 1) + cbrt(x) + cbrt(x + 1)) == []

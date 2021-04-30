@@ -8,11 +8,8 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: [3.8, 3.9]
-        coverage: [false]
-        include:
-          - python-version: 3.9
-            coverage: true
+        python-version: [3.9]
+        coverage: [false, true]
     runs-on: ubuntu-latest
     env:
       TERM: xterm
@@ -33,8 +30,9 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -U pip setuptools
-        pip install -U https://github.com/kataev/flake8-rst/archive/master.zip
         pip install -U .[interactive,develop,gmpy,exports,plot,docs]
+        # workaround fredrik-johansson/mpmath#571 and fredrik-johansson/mpmath#438
+        pip install git+https://github.com/fredrik-johansson/mpmath.git@1bb25a4
     - name: Linting with flake8, flake8-rst and pylint
       run: |
         python -We:invalid -m compileall -f diofant -q
@@ -51,7 +49,7 @@ jobs:
     - name: Coverage tests
       if: matrix.coverage
       env:
-        PYTEST_ADDOPTS: --cov diofant --cov-append -m "not slow and not xfail" --ignore docs
+        PYTEST_ADDOPTS: --cov diofant --cov-append -m "not slow and not xfail and not regression" --ignore docs
       run: |
         pytest
         pip uninstall -y gmpy2

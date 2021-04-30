@@ -1,6 +1,7 @@
 """Tests for user-friendly public interface to polynomial functions."""
 
 import functools
+import math
 
 import pytest
 
@@ -16,8 +17,8 @@ from diofant import (CC, EX, FF, LC, LM, LT, QQ, RR, ZZ, CoercionFailed,
                      count_roots, decompose, degree, diff, discriminant, div,
                      exp, expand, exquo, factor, factor_list, false, gcd,
                      gcdex, grevlex, grlex, groebner, half_gcdex, im, invert,
-                     lcm, lex, monic, nroots, oo, parallel_poly_from_expr, pi,
-                     poly, prem, primitive, quo, re, real_roots, reduced, rem,
+                     lcm, lex, log, monic, nroots, oo, parallel_poly_from_expr,
+                     pi, poly, primitive, quo, re, real_roots, reduced, rem,
                      resultant, sin, sqf, sqf_list, sqf_norm, sqf_part, sqrt,
                      subresultants, symbols, sympify, tanh, terms_gcd, true,
                      trunc)
@@ -1062,19 +1063,19 @@ def test_Poly__gen_to_level():
 
 
 def test_Poly_degree():
-    assert Integer(0).as_poly(x).degree() == -oo
+    assert Integer(0).as_poly(x).degree() == -math.inf
     assert Integer(1).as_poly(x).degree() == 0
     assert x.as_poly().degree() == 1
 
-    assert Integer(0).as_poly(x).degree(gen=0) == -oo
+    assert Integer(0).as_poly(x).degree(gen=0) == -math.inf
     assert Integer(1).as_poly(x).degree(gen=0) == 0
     assert x.as_poly().degree(gen=0) == 1
 
-    assert Integer(0).as_poly(x).degree(gen=x) == -oo
+    assert Integer(0).as_poly(x).degree(gen=x) == -math.inf
     assert Integer(1).as_poly(x).degree(gen=x) == 0
     assert x.as_poly().degree(gen=x) == 1
 
-    assert Integer(0).as_poly(x).degree(gen='x') == -oo
+    assert Integer(0).as_poly(x).degree(gen='x') == -math.inf
     assert Integer(1).as_poly(x).degree(gen='x') == 0
     assert x.as_poly().degree(gen='x') == 1
 
@@ -1117,8 +1118,8 @@ def test_sympyissue_6322():
 
 
 def test_Poly_degree_list():
-    assert [Integer(0).as_poly(x, y).degree(_) for _ in (x, y)] == [-oo, -oo]
-    assert [Integer(0).as_poly(x, y, z).degree(_) for _ in (x, y, z)] == [-oo, -oo, -oo]
+    assert [Integer(0).as_poly(x, y).degree(_) for _ in (x, y)] == [-math.inf]*2
+    assert [Integer(0).as_poly(x, y, z).degree(_) for _ in (x, y, z)] == [-math.inf]*3
 
     assert [Integer(1).as_poly(x, y).degree(_) for _ in (x, y)] == [0, 0]
     assert [Integer(1).as_poly(x, y, z).degree(_) for _ in (x, y, z)] == [0, 0, 0]
@@ -1348,6 +1349,10 @@ def test_Poly_diff():
     assert Derivative(f, x).doit() == (2*x + 1).as_poly()
     assert f.diff(x, evaluate=False) == Derivative(f, x)
 
+    f = (x**2 + 2*x + 1).as_poly()
+
+    assert f.diff() == (2*x + 2).as_poly()
+
     f = (x**2*y**2 + x*y).as_poly()
 
     assert f.diff(x) == (2*x*y**2 + y).as_poly()
@@ -1361,6 +1366,10 @@ def test_Poly_diff():
 
     assert f.diff(x, y) == (4*x*y + 1).as_poly()
     assert f.diff(y, x) == (4*x*y + 1).as_poly()
+
+    f = (x*y**2 + x).as_poly()
+
+    assert f.diff((x, 0), (y, 1)) == (2*x*y).as_poly()
 
 
 def test_Poly_eval():
@@ -1506,23 +1515,6 @@ def test_parallel_poly_from_expr():
             ([((x - 1)**2).as_poly(x - 1, expand=False), Integer(1).as_poly(x - 1)],
              {'domain': ZZ, 'expand': False, 'gens': (x - 1,),
               'polys': False}))
-
-
-def test_prem():
-    f, g = x**2 - y**2, x - y
-    q, r = x + y, Integer(0)
-
-    F, G, Q, R = [h.as_poly(x, y) for h in (f, g, q, r)]
-
-    assert F.prem(G) == R
-
-    assert prem(f, g) == r
-    assert prem(f, g, x, y) == r
-    assert prem(F, G) == R
-    assert prem(f, g, polys=True) == R
-    assert prem(F, G, polys=False) == r
-
-    pytest.raises(ComputationFailed, lambda: prem(4, 2))
 
 
 def test_div():
@@ -3147,12 +3139,6 @@ def test_sympyissue_19161():
     assert sympify('x**2').as_poly().simplify() == (x**2).as_poly()
 
 
-def test_sympyissue_20397():
-    f, g = (x**2 + x + 3).as_poly(modulus=7), (2*x + 2).as_poly(modulus=7)
-
-    assert f.prem(g) == 5
-
-
 def test_sympyissue_20484():
     assert (x*y*z).as_poly().eval(x, y*z) == (y**2*z**2).as_poly()
 
@@ -3172,3 +3158,14 @@ def test_sympyissue_20973():
 
 def test_sympyissue_20985():
     assert degree(1.0 + I*x/y, domain=CC.frac_field(y)) == 1
+
+
+def test_sympyissue_21180():
+    f = (x**4 + 6*x**3 + 4*x**2 - 30*x - 45).as_poly()
+    assert factor(f) == (x + 3)**2*(x**2 - 5)
+
+
+def test_sympyissue_20444():
+    e = 33*log(x) + log(8) + 58
+
+    assert LT(e) == 3*log(2)
