@@ -374,7 +374,8 @@ def test_bug5():
     e = (-log(w) + log(1 + w*log(x)))**(-2)*w**(-2)*((-log(w) +
                                                       log(1 + x*w))*(-log(w) + log(1 + w*log(x)))*w - x*(-log(w) +
                                                                                                          log(1 + w*log(x)))*w)
-    assert e.nseries(w, n=1, logx=l) == (x/l + 1)/w + O(1, w)
+    assert e.nseries(w, n=1,
+                     logx=l).expand().collect(w) == (x/l + 1)/w + O(1, w)
     assert e.nseries(w, n=2, logx=l) == x*log(x)/l**2 + log(x)/l - \
         x/l + (1 + x/l)/w + O(w)
 

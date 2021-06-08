@@ -576,7 +576,8 @@ def test_sympyissue_12769():
 def test_sympyissue_13332():
     assert limit(sqrt(30)*5**(-5*n - 1)*(46656*n)**n *
                  (5*n + 2)**(5*n + Rational(5, 2)) *
-                 (6*n + 2)**(-6*n - Rational(5, 2)), n, oo) == Rational(25, 36)
+                 (6*n + 2)**(-6*n - Rational(5, 2)),
+                 n, oo).simplify() == Rational(25, 36)
 
 
 def test_sympyissue_13382():
